@@ -13,6 +13,7 @@
 """
 from flask import Flask, request, session, g, url_for, redirect, \
 	 render_template, abort, flash
+from contextlib import closing
 
 import sqlite3
 
@@ -37,6 +38,13 @@ def init_db():
 			db.cursor().executescript(f.read())
 		db.commit()
 
+def query_db(query, args=(), one = False):
+	"""Queries the database and returns a list of dictionaries."""
+	cur = g.db.execute(query, args)
+	rv = [dict((cur.description[idx][0], value)
+    	for idx, value in enumerate(row)) for row in cur.fetchall()]
+	return (rv[0] if rv else None) if one else rv
+
 @app.before_request
 def before_request():
 	"""Connects to the database before each request."""
@@ -50,11 +58,9 @@ def after_request(response):
 	return response
 
 @app.route('/')
-def hello_world():
-	"""This is only a test."""
-	return "<h1>Hello world!</h1>"
-
-	
+def list_entries():
+	entries = query_db("SELECT title, body, last_date, creation_date FROM entry")
+	return render_template("list_entries.html", entries=entries)
 
 if __name__=="__main__":
 	app.run()
