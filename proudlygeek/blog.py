@@ -17,20 +17,18 @@ from contextlib import closing
 
 import sqlite3
 import hashlib
+from config import mode
 
 # creates the app
 app = Flask(__name__)
 
 try:
+	# If config.cfg exists then override default config
 	app.config.from_pyfile('config.cfg')
 
 except:
-	# Default config (use config.cfg for your configuration)
-	default_config = """ DATABASE = '/tmp/blog.db'
-						 DEBUG = True
-						 SECRET_KEY = 'development key'
-		   			 """
-	app.config.from_object(default_config)
+	# Load Default Config (see config/mode.py)
+	app.config.from_object(mode.DevelopmentConfig)
 
 def connect_db():
 	"""Returns a new connection to the database."""
