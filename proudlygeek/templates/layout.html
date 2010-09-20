@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title> Blog test </title>
+  </head>
+  <body>
+	<div class = "login_bar">
+  	{% if session['user_id'] %}
+		<p><a href = "{{url_for('logout')}}">Logout</a></p>
+	{% else %}
+		<p><a href = "{{url_for('login')}}">Login</a></p>
+	{% endif %}
+	{% for message in get_flashed_messages() %}
+        <div class = flash>{{ message }} </div>
+	{% endfor %}	
+    {% block body %}
+    {% endblock %}
+  </body>
+</html>
