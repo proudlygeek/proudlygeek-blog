@@ -63,8 +63,13 @@ def check_password_hash(string, check):
 
 @app.before_request
 def before_request():
-	"""Connects to the database before each request."""
+	"""Connects to the database before each request and look up the current user."""
 	g.db = connect_db()
+	g.user = None
+	if 'user_id' in session:
+		g.user = query_db('select * from user where user_id = ?',
+						  [session['user_id']], one = True)
+		
 
 
 @app.after_request
@@ -107,6 +112,8 @@ def logout():
 	session.pop('user_id', None)
 	flash("You were logged out")
 	return redirect(url_for('list_entries'))
+
+@app.route('/add_
 
 if __name__=="__main__":
 	app.run()
