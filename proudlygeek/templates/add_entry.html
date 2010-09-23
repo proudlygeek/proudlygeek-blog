@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class = "add-form">
+  <form action ="{{url_for('add_entry')}}" method = "POST">
+    <p><label>Title: <input type = "text", name = "title"></label></p>
+    <p><label><p>Enter your message:</p> <textarea cols = 65 rows = 10 name = "entry_text"></textarea></p>
+    <p><input type = "submit" value = "Submit"></p>
+  </form>
+</div>
+{% endblock %}

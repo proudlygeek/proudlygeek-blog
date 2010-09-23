@@ -17,6 +17,7 @@ from contextlib import closing
 
 import sqlite3
 import hashlib
+import datetime
 from config import mode
 
 # creates the app
@@ -50,7 +51,7 @@ def query_db(query, args=(), one = False):
 	"""Queries the database and returns a list of dictionaries."""
 	cur = g.db.execute(query, args)
 	rv = [dict((cur.description[idx][0], value)
-    	for idx, value in enumerate(row)) for row in cur.fetchall()]
+    for idx, value in enumerate(row)) for row in cur.fetchall()]
 	return (rv[0] if rv else None) if one else rv
 
 def check_password_hash(string, check):
@@ -67,9 +68,10 @@ def before_request():
 	g.db = connect_db()
 	g.user = None
 	if 'user_id' in session:
-		g.user = query_db('select * from user where user_id = ?',
+		g.user = query_db('SELECT user.id, user.username, rank.id, rank.role_name \
+                           FROM user join rank on user.rank_id_FK = rank.id \
+                           WHERE user.id = ?',
 						  [session['user_id']], one = True)
-		
 
 
 @app.after_request
@@ -91,7 +93,6 @@ def login():
 		user =  query_db(
             'SELECT * FROM user WHERE username = ?',
             [request.form['username']], one = True)
-		
 		if user is None:
 			error = 'Invalid username: %s, %s' % (request.form['username'], user)
 
@@ -113,7 +114,34 @@ def logout():
 	flash("You were logged out")
 	return redirect(url_for('list_entries'))
 
-@app.route('/add_
+@app.route('/add_entry', methods=['GET','POST'])
+def add_entry():
+    """Adds a new entry."""
+    if g.user:
+        error = None
+        if request.method == 'POST':
+            if request.form['title'] is None:
+                error = "The title can't be empty!"
+            elif request.form['entry_text'] is None:
+                error = "C'mon, write something!"
+            else:
+                today = datetime.date.today()
+                g.db.execute("INSERT INTO entry VALUES \
+                              (null, ?, ?, ?, null, ?)",
+                              (request.form['title'], 
+                               request.form['entry_text'],
+                               today.strftime('%Y-%m-%d'),
+                               g.user['id'])
+                            )
+                g.db.commit()
+                flash('Entry added.')
+                return redirect(url_for('list_entries'))
+
+        return render_template('add_entry.html', error=error)
+
+    return redirect(url_for('list_entries'))
+            
+        
 
 if __name__=="__main__":
 	app.run()

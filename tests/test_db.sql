@@ -36,8 +36,8 @@ CREATE TABLE tag (
 );
 
 /* Sample data */
-INSERT INTO "user" VALUES(1,'bargio','f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe',0);
-INSERT INTO "user" VALUES(2, 'test', '90a3ed9e32b2aaf4c61c410eb925426119e1a9dc53d4286ade99a809',0);
+INSERT INTO "user" VALUES(1,'bargio','f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe',1);
+INSERT INTO "user" VALUES(2, 'test', '90a3ed9e32b2aaf4c61c410eb925426119e1a9dc53d4286ade99a809',1);
 INSERT INTO "rank" VALUES(1,'administrator');
 
 DELETE FROM sqlite_sequence;
