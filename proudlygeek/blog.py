@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    ProudlyGeek's Blog 
+    ProudlyGeek's Blog
     ~~~~~~~~~~~~~~~~~~
 
     A simple blog app written with Flask and sqlite3.
@@ -31,11 +31,13 @@ except:
     # Load Default Config (see config/mode.py)
     app.config.from_object(mode.DevelopmentConfig)
 
+
 def connect_db():
     """Returns a new connection to the database."""
     return sqlite3.connect(app.config['DATABASE'])
 
-def init_db(testdb = False):
+
+def init_db(testdb=False):
     """Creates the database tables."""
     if not testdb:
         schema = 'schema.sql'
@@ -47,31 +49,42 @@ def init_db(testdb = False):
             db.cursor().executescript(f.read())
         db.commit()
 
-def query_db(query, args=(), one = False):
+
+def query_db(query, args=(), one=False):
     """Queries the database and returns a list of dictionaries."""
     cur = g.db.execute(query, args)
     rv = [dict((cur.description[idx][0], value)
     for idx, value in enumerate(row)) for row in cur.fetchall()]
     return (rv[0] if rv else None) if one else rv
 
+
 def check_password_hash(string, check):
-    """Checks if the supplied string is equal to the password hash saved into the database."""
+    """
+    Checks if the supplied string is equal to the password hash
+    saved into the database.
+    """
     stringHash = hashlib.sha224(string).hexdigest()
     if stringHash == check:
         return True
     else:
         return False
 
+
 @app.before_request
 def before_request():
-    """Connects to the database before each request and look up the current user."""
+    """
+    Connects to the database before each request and
+    looks up the current user.
+    """
     g.db = connect_db()
     g.user = None
     if 'user_id' in session:
-        g.user = query_db('SELECT user.id, user.username, rank.id, rank.role_name \
-                           FROM user join rank on user.rank_id_FK = rank.id \
-                           WHERE user.id = ?',
-                          [session['user_id']], one = True)
+        g.user = query_db(
+                 'SELECT user.id, user.username, rank.id, rank.role_name \
+                  FROM user join rank on user.rank_id_FK = rank.id \
+                  WHERE user.id = ?',
+                  [session['user_id']],
+                  one=True)
 
 
 @app.after_request
@@ -80,23 +93,32 @@ def after_request(response):
     g.db.close()
     return response
 
+
 @app.route('/')
 def list_entries():
-    entries = query_db("SELECT title, body, last_date, creation_date FROM entry")
+    entries = query_db(
+              'SELECT title, body, last_date, creation_date \
+               FROM entry')
     return render_template("list_entries.html", entries=entries)
 
-@app.route('/login',methods=['GET', 'POST'])
+
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     """Authenticate a user into the application given his credentials."""
     error = None
     if request.method == 'POST':
-        user =  query_db(
-            'SELECT * FROM user WHERE username = ?',
-            [request.form['username']], one = True)
-        if user is None:
-            error = 'Invalid username: %s, %s' % (request.form['username'], user)
+        user = query_db(
+               'SELECT * FROM user \
+                WHERE username = ?',
+                [request.form['username']],
+                one=True)
 
-        elif not check_password_hash(request.form['password'], user['password']):
+        if user is None:
+            error = 'Invalid username: %s, %s' \
+                    % (request.form['username'], user)
+
+        elif not check_password_hash(request.form['password'], \
+                                     user['password']):
             error = 'Invalid password'
 
         else:
@@ -107,6 +129,7 @@ def login():
     # If the request is GET then return the login form
     return render_template('login.html', error=error)
 
+
 @app.route('/logout')
 def logout():
     """Logout the current user."""
@@ -114,7 +137,8 @@ def logout():
     flash("You were logged out")
     return redirect(url_for('list_entries'))
 
-@app.route('/add_entry', methods=['GET','POST'])
+
+@app.route('/add_entry', methods=['GET', 'POST'])
 def add_entry():
     """Adds a new entry."""
     if g.user:
@@ -122,17 +146,20 @@ def add_entry():
         if request.method == 'POST':
             if request.form['title'] is None:
                 error = "The title can't be empty!"
+
             elif request.form['entry_text'] is None:
                 error = "C'mon, write something!"
+
             else:
                 today = datetime.date.today()
-                g.db.execute("INSERT INTO entry VALUES \
-                              (null, ?, ?, ?, null, ?)",
-                              (request.form['title'], 
-                                  request.form['entry_text'],
-                               today.strftime('%Y-%m-%d'),
-                               g.user['id'])
-                            )
+                g.db.execute(
+                'INSERT INTO entry \
+                 VALUES (null, ?, ?, ?, null, ?)',
+                (request.form['title'],
+                 request.form['entry_text'],
+                 today.strftime('%Y-%m-%d'),
+                 g.user['id']))
+
                 g.db.commit()
                 flash('Entry added.')
                 return redirect(url_for('list_entries'))
@@ -140,8 +167,6 @@ def add_entry():
         return render_template('add_entry.html', error=error)
 
     return redirect(url_for('list_entries'))
-            
-        
 
-if __name__=="__main__":
+if __name__ == "__main__":
     app.run()
