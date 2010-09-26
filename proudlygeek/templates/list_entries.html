@@ -2,10 +2,12 @@
 {% block body %}
   <ul class=entries>
     {% for entry in entries %}
-      <li><h2>{{ entry.title }}</h2>
+    <li>
+      <h2>{{ entry.title }}</h2>
       {{ entry.creation_date }} {{ entry.body|safe }}
     {% else %}
-      <li><em>Unbelievable. No entries here so far</em>
+    <em>Unbelievable. No entries here so far</em>
     {% endfor %}
+    </li>
   </ul>
 {% endblock %}

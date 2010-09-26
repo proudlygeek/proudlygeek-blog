@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 
-	ProudlyGeek's Blog 
-	~~~~~~~~~~~~~~~~~~
+    ProudlyGeek's Blog 
+    ~~~~~~~~~~~~~~~~~~
 
-	A simple blog app written with Flask and sqlite3.
+    A simple blog app written with Flask and sqlite3.
 
-	:copyright: (c) 2010 by Gianluca Bargelli.
-	:license: MIT License, see LICENSE for more details.
+    :copyright: (c) 2010 by Gianluca Bargelli.
+    :license: MIT License, see LICENSE for more details.
 
 
 """
 from flask import Flask, request, session, g, url_for, redirect, \
-	 render_template, abort, flash
+     render_template, abort, flash
 from contextlib import closing
 
 import sqlite3
@@ -24,95 +24,95 @@ from config import mode
 app = Flask(__name__)
 
 try:
-	# If config.cfg exists then override default config
-	app.config.from_pyfile('config.cfg')
+    # If config.cfg exists then override default config
+    app.config.from_pyfile('config.cfg')
 
 except:
-	# Load Default Config (see config/mode.py)
-	app.config.from_object(mode.DevelopmentConfig)
+    # Load Default Config (see config/mode.py)
+    app.config.from_object(mode.DevelopmentConfig)
 
 def connect_db():
-	"""Returns a new connection to the database."""
-	return sqlite3.connect(app.config['DATABASE'])
+    """Returns a new connection to the database."""
+    return sqlite3.connect(app.config['DATABASE'])
 
 def init_db(testdb = False):
-	"""Creates the database tables."""
-	if not testdb:
-		schema = 'schema.sql'
-	else:
-		schema = '../tests/test_db.sql'
+    """Creates the database tables."""
+    if not testdb:
+        schema = 'schema.sql'
+    else:
+        schema = '../tests/test_db.sql'
 
-	with closing(connect_db()) as db:
-		with app.open_resource(schema) as f:
-			db.cursor().executescript(f.read())
-		db.commit()
+    with closing(connect_db()) as db:
+        with app.open_resource(schema) as f:
+            db.cursor().executescript(f.read())
+        db.commit()
 
 def query_db(query, args=(), one = False):
-	"""Queries the database and returns a list of dictionaries."""
-	cur = g.db.execute(query, args)
-	rv = [dict((cur.description[idx][0], value)
+    """Queries the database and returns a list of dictionaries."""
+    cur = g.db.execute(query, args)
+    rv = [dict((cur.description[idx][0], value)
     for idx, value in enumerate(row)) for row in cur.fetchall()]
-	return (rv[0] if rv else None) if one else rv
+    return (rv[0] if rv else None) if one else rv
 
 def check_password_hash(string, check):
-	"""Checks if the supplied string is equal to the password hash saved into the database."""
-	stringHash = hashlib.sha224(string).hexdigest()
-	if stringHash == check:
-		return True
-	else:
-		return False
+    """Checks if the supplied string is equal to the password hash saved into the database."""
+    stringHash = hashlib.sha224(string).hexdigest()
+    if stringHash == check:
+        return True
+    else:
+        return False
 
 @app.before_request
 def before_request():
-	"""Connects to the database before each request and look up the current user."""
-	g.db = connect_db()
-	g.user = None
-	if 'user_id' in session:
-		g.user = query_db('SELECT user.id, user.username, rank.id, rank.role_name \
+    """Connects to the database before each request and look up the current user."""
+    g.db = connect_db()
+    g.user = None
+    if 'user_id' in session:
+        g.user = query_db('SELECT user.id, user.username, rank.id, rank.role_name \
                            FROM user join rank on user.rank_id_FK = rank.id \
                            WHERE user.id = ?',
-						  [session['user_id']], one = True)
+                          [session['user_id']], one = True)
 
 
 @app.after_request
 def after_request(response):
-	"""Closes the database again at the end of the request."""
-	g.db.close()
-	return response
+    """Closes the database again at the end of the request."""
+    g.db.close()
+    return response
 
 @app.route('/')
 def list_entries():
-	entries = query_db("SELECT title, body, last_date, creation_date FROM entry")
-	return render_template("list_entries.html", entries=entries)
+    entries = query_db("SELECT title, body, last_date, creation_date FROM entry")
+    return render_template("list_entries.html", entries=entries)
 
 @app.route('/login',methods=['GET', 'POST'])
 def login():
-	"""Authenticate a user into the application given his credentials."""
-	error = None
-	if request.method == 'POST':
-		user =  query_db(
+    """Authenticate a user into the application given his credentials."""
+    error = None
+    if request.method == 'POST':
+        user =  query_db(
             'SELECT * FROM user WHERE username = ?',
             [request.form['username']], one = True)
-		if user is None:
-			error = 'Invalid username: %s, %s' % (request.form['username'], user)
+        if user is None:
+            error = 'Invalid username: %s, %s' % (request.form['username'], user)
 
-		elif not check_password_hash(request.form['password'], user['password']):
-			error = 'Invalid password'
+        elif not check_password_hash(request.form['password'], user['password']):
+            error = 'Invalid password'
 
-		else:
-			session['user_id'] = user['id']
-			flash('You were logged in')
-			return redirect(url_for('list_entries'))
+        else:
+            session['user_id'] = user['id']
+            flash('You were logged in')
+            return redirect(url_for('list_entries'))
 
-	# If the request is GET then return the login form
-	return render_template('login.html', error=error)
+    # If the request is GET then return the login form
+    return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
-	"""Logout the current user."""
-	session.pop('user_id', None)
-	flash("You were logged out")
-	return redirect(url_for('list_entries'))
+    """Logout the current user."""
+    session.pop('user_id', None)
+    flash("You were logged out")
+    return redirect(url_for('list_entries'))
 
 @app.route('/add_entry', methods=['GET','POST'])
 def add_entry():
@@ -129,7 +129,7 @@ def add_entry():
                 g.db.execute("INSERT INTO entry VALUES \
                               (null, ?, ?, ?, null, ?)",
                               (request.form['title'], 
-                               request.form['entry_text'],
+                                  request.form['entry_text'],
                                today.strftime('%Y-%m-%d'),
                                g.user['id'])
                             )
@@ -144,4 +144,4 @@ def add_entry():
         
 
 if __name__=="__main__":
-	app.run()
+    app.run()
