@@ -52,6 +52,13 @@ class BlogTestCase(unittest.TestCase):
 
         return rv
 
+    def view_entry(self, year, month, day, slug):
+        """Helper function for viewing single entries."""
+        return self.app.get('/articles/%s/%s/%s/%s' % (year,
+                                                       month,
+                                                       day,
+                                                       slug))
+
     def test_empty_db(self):
         """Tests if an initial database is empty."""
         rv = self.app.get("/")
@@ -83,9 +90,39 @@ class BlogTestCase(unittest.TestCase):
         rv = self.app.get("/add_entry")
         assert "Enter your message:" in rv.data
         rv = self.add_entry('Test Title', 'this is a test!')
+        # Testing the correctness of the inserted data
         assert """<h2>Test Title</h2>""" in rv.data
         assert """%s this is a test!""" \
-        % (today.strftime('%Y-%m-%d')) in rv.data
+               % (today.strftime('%Y-%m-%d')) in rv.data
+        assert """<a href = /articles/%s/%s/%s/%s>read on</a>""" \
+               % (today.year, today.month, today.day, 'this-is-a-test')
+
+    def test_slugify_entry(self):
+        """Test if slugify_entry generates a correct slug."""
+        # Basic check
+        rv = blog.slugify_entry(u"""!!"£$%&/()=?^'[]@#`<>'"%ciao mondo!""")
+        assert u'ciao-mondo' == rv
+
+    def test_view_entry(self):
+        """Tests if entry view works correctly."""
+        today = datetime.date.today()
+        # Login
+        self.login('test', 'test')
+        # Adding an entry
+        self.add_entry('Test Title', 'this is a test!')
+        # Testing GOOD date, GOOD slug
+        rv = self.view_entry(today.year, today.month, today.day, 'test-title')
+        assert '404 Not Found' not in rv.data
+        assert '400 Bad Request' not in rv.data
+        # Testing GOOD date, BAD slug
+        rv = self.view_entry(today.year, today.month, today.day, 'test123')
+        assert '404 Not Found' in rv.data
+        # Testing BAD date, GOOD slug
+        rv = self.view_entry('1800','01','01','test-title')
+        assert '404 Not Found' in rv.data
+        # Testing WRONG date
+        rv = self.view_entry('9999999','13','40','test-title')
+        assert '400 Bad Request' in rv.data
 
 if __name__ == '__main__':
     unittest.main()
