@@ -13,12 +13,14 @@ CREATE TABLE rank (
 
 DROP TABLE IF EXISTS entry;
 CREATE TABLE entry (
-	id INTEGER PRIMARY KEY autoincrement,
-	title VARCHAR(30) NOT NULL,
+	id INTEGER NOT NULL,
+    slug VARCHAR(80) NOT NULL,
+	title VARCHAR(80) NOT NULL,
 	body TEXT NOT NULL,
 	creation_date DATE NOT NULL,
 	last_date DATE,
-	user_id_FK INTEGER NOT NULL REFERENCES user(id)
+	user_id_FK INTEGER NOT NULL REFERENCES user(id),
+    PRIMARY KEY(id, slug)
 );
 
 DROP TABLE IF EXISTS entry_tags;

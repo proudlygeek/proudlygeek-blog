@@ -18,6 +18,8 @@ from contextlib import closing
 import sqlite3
 import hashlib
 import datetime
+import re
+from unicodedata import normalize
 from config import mode
 
 # creates the app
@@ -70,6 +72,21 @@ def check_password_hash(string, check):
         return False
 
 
+def slugify_entry(entry_title, delim=u'-'):
+    """
+    Creates a valid URI title by replacing whitespaces with a '-'
+    and by stripping all non-words in a string (that is, only a-z
+    and A-Z).
+    """
+    _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.:]+')
+    result = []
+    for word in _punct_re.split(entry_title.lower()):
+        word = normalize('NFKD', word).encode('ascii', 'ignore')
+        if word:
+            result.append(word)
+    return unicode(delim.join(result))
+
+
 @app.before_request
 def before_request():
     """
@@ -97,7 +114,7 @@ def after_request(response):
 @app.route('/')
 def list_entries():
     entries = query_db(
-              'SELECT title, body, last_date, creation_date \
+              'SELECT slug, title, body, last_date, creation_date \
                FROM entry')
     return render_template("list_entries.html", entries=entries)
 
@@ -114,8 +131,7 @@ def login():
                 one=True)
 
         if user is None:
-            error = 'Invalid username: %s, %s' \
-                    % (request.form['username'], user)
+            error = 'Invalid username'
 
         elif not check_password_hash(request.form['password'], \
                                      user['password']):
@@ -154,8 +170,10 @@ def add_entry():
                 today = datetime.date.today()
                 g.db.execute(
                 'INSERT INTO entry \
-                 VALUES (null, ?, ?, ?, null, ?)',
-                (request.form['title'],
+                 VALUES (null, ?, ?, ?, ?, null, ?)',
+                (
+                 slugify_entry(request.form['title']),
+                 request.form['title'],
                  request.form['entry_text'],
                  today.strftime('%Y-%m-%d'),
                  g.user['id']))
@@ -167,6 +185,30 @@ def add_entry():
         return render_template('add_entry.html', error=error)
 
     return redirect(url_for('list_entries'))
+
+
+@app.route('/articles/<int:year>/<int:month>/<int:day>/<title>')
+def view_entry(year, month, day, title):
+    """Retrieves an article by date and title."""
+    try:
+        entrydate = datetime.date(year, month, day)
+    except:
+        abort(401)
+
+    print "Title: %s; Date: %s" % (title, entrydate)
+
+    entry = query_db(
+            'SELECT * FROM entry \
+             WHERE slug = ? \
+             AND creation_date = ?',
+             [title, entrydate],
+             one=True)
+
+    if entry is None:
+        abort(401)
+
+    else:
+        return render_template('entry.html', entry=entry)
 
 if __name__ == "__main__":
     app.run()
