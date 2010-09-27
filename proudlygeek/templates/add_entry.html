@@ -1,9 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
+{% if errors %} 
+<p class = error>
+<strong>Error: </strong>
+  <ul>
+  {% for error in errors %}
+    <li>{{error}}</li>
+  {% endfor %}
+{% endif %}
 <div class = "add-form">
   <form action ="{{url_for('add_entry')}}" method = "POST">
     <p><label>Title: <input type = "text", name = "title"></label></p>
     <p><label><p>Enter your message:</p> <textarea cols = 65 rows = 10 name = "entry_text"></textarea></p>
+    <p><label><p>Tags:</p><input type = "text" name = "tags-field" >
     <p><input type = "submit" value = "Submit"></p>
   </form>
 </div>

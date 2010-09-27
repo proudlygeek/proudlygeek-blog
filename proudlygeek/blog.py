@@ -158,15 +158,15 @@ def logout():
 def add_entry():
     """Adds a new entry."""
     if g.user:
-        error = None
         if request.method == 'POST':
-            if request.form['title'] is None:
-                error = "The title can't be empty!"
+            errors = []
+            if request.form['title'] == '':
+                errors.append('No title supplied')
 
-            elif request.form['entry_text'] is None:
-                error = "C'mon, write something!"
+            if request.form['entry_text'] == '':
+                errors.append('Message body is empty')
 
-            else:
+            if (errors == []):
                 today = datetime.date.today()
                 g.db.execute(
                 'INSERT INTO entry \
@@ -182,7 +182,7 @@ def add_entry():
                 flash('Entry added.')
                 return redirect(url_for('list_entries'))
 
-        return render_template('add_entry.html', error=error)
+        return render_template('add_entry.html', errors=errors)
 
     return redirect(url_for('list_entries'))
 
