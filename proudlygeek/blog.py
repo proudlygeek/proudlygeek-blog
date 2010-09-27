@@ -193,7 +193,7 @@ def view_entry(year, month, day, title):
     try:
         entrydate = datetime.date(year, month, day)
     except:
-        abort(401)
+        abort(400)
 
     print "Title: %s; Date: %s" % (title, entrydate)
 
@@ -205,7 +205,7 @@ def view_entry(year, month, day, title):
              one=True)
 
     if entry is None:
-        abort(401)
+        abort(404)
 
     else:
         return render_template('entry.html', entry=entry)
