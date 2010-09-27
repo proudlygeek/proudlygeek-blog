@@ -91,11 +91,21 @@ class BlogTestCase(unittest.TestCase):
         assert "Enter your message:" in rv.data
         rv = self.add_entry('Test Title', 'this is a test!')
         # Testing the correctness of the inserted data
-        assert """<h2>Test Title</h2>""" in rv.data
         assert """%s this is a test!""" \
                % (today.strftime('%Y-%m-%d')) in rv.data
-        assert """<a href = /articles/%s/%s/%s/%s>read on</a>""" \
+        assert """<a href = /articles/%s/%s/%s/%s>Test Title</a>""" \
                % (today.year, today.month, today.day, 'this-is-a-test')
+        # Testing BLANK Title
+        rv = self.add_entry('','this is a test!')
+        assert 'No title supplied' in rv.data
+        # Testing BLANK Text
+        rv = self.add_entry('Test Title','')
+        assert 'Message body is empty' in rv.data
+        # Testing BLANK Title, BLANK Text
+        rv = self.add_entry('','')
+        assert 'No title supplied' in rv.data
+        assert 'Message body is empty' in rv.data
+
 
     def test_slugify_entry(self):
         """Test if slugify_entry generates a correct slug."""

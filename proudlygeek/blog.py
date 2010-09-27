@@ -158,8 +158,9 @@ def logout():
 def add_entry():
     """Adds a new entry."""
     if g.user:
+        errors = []
         if request.method == 'POST':
-            errors = []
+
             if request.form['title'] == '':
                 errors.append('No title supplied')
 
