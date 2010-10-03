@@ -257,10 +257,26 @@ def view_entry(year, month, day, title):
 
     if entry is None:
         abort(404)
-
     else:
         fill_tags([entry])
         return render_template('entry.html', entry=entry)
+
+
+@app.route('/tags/<tagname>')
+def list_entries_by_tag(tagname):
+    """Lists all entries given a tag's name."""
+    entries = query_db(
+              """
+              SELECT entry.id, entry.slug, entry.title, entry.body, 
+              entry.last_date,entry.creation_date FROM entry
+              JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
+              JOIN tag ON entry_tags.id_tag_FK = tag.id
+              WHERE tag.name = ?
+              """,
+              [tagname])
+
+    fill_tags(entries)
+    return render_template("list_entries.html", entries=entries)
 
 if __name__ == "__main__":
     app.run()
