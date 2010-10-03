@@ -42,10 +42,11 @@ class BlogTestCase(unittest.TestCase):
         """Helper function for user logout."""
         return self.app.get('/logout', follow_redirects=True)
 
-    def add_entry(self, title, text):
+    def add_entry(self, title, text, tags=""):
         """Helper function for adding entries."""
         rv = self.app.post('/add_entry', data={'title': title,
-                                               'entry_text': text},
+                                               'entry_text': text,
+                                               'tags': tags},
                                                follow_redirects=True)
         if title and text:
             assert 'Entry added.' in rv.data
@@ -84,7 +85,7 @@ class BlogTestCase(unittest.TestCase):
         in rv.data
 
     def test_add_entry(self):
-        """Add a test entry and see if it works correctly"""
+        """Add a test entry and see if it works correctly."""
         today = datetime.date.today()
         self.login('test', 'test')
         rv = self.app.get("/add_entry")
@@ -113,17 +114,29 @@ class BlogTestCase(unittest.TestCase):
         rv = blog.slugify_entry(u"""!!"£$%&/()=?^'[]@#`<>'"%ciao mondo!""")
         assert u'ciao-mondo' == rv
 
+    def test_add_entry_with_tags(self):
+        """Add a test entry with multiple tags."""
+        self.login('test','test')
+        self.app.get('/add_entry')
+        rv = self.add_entry('Test Title', 'this is a test!', 'tag1 tag2 tag3')
+        assert 'tag1' in rv.data
+        assert 'tag2' in rv.data
+        assert 'tag3' in rv.data
+
     def test_view_entry(self):
         """Tests if entry view works correctly."""
         today = datetime.date.today()
         # Login
         self.login('test', 'test')
         # Adding an entry
-        self.add_entry('Test Title', 'this is a test!')
+        self.add_entry('Test Title', 'this is a test!','tag1 tag2 tag3')
         # Testing GOOD date, GOOD slug
         rv = self.view_entry(today.year, today.month, today.day, 'test-title')
         assert '404 Not Found' not in rv.data
         assert '400 Bad Request' not in rv.data
+        assert 'tag1' in rv.data
+        assert 'tag2' in rv.data
+        assert 'tag3' in rv.data
         # Testing GOOD date, BAD slug
         rv = self.view_entry(today.year, today.month, today.day, 'test123')
         assert '404 Not Found' in rv.data
