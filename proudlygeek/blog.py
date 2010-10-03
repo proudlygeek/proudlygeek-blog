@@ -91,9 +91,8 @@ def process_tags(entry_id, tags_list):
     For each tag into tags_list it retrieves it's id from the database;
     if a supplied tag is not recorded then it creates a new database record.
     """
-    print tags_list
     for tag in tags_list:
-        current=query_db('SELECT id from tag \
+        current=query_db('SELECT id FROM tag \
                           WHERE tag.name = ?',
                           [tag],
                           one=True)
@@ -103,7 +102,8 @@ def process_tags(entry_id, tags_list):
                           VALUES (null, ?)',
                           [tag])
 
-            current = query_db('SELECT last_insert_rowid()', one=True)['last_insert_rowid()']
+            current = query_db('SELECT last_insert_rowid()', 
+                                one=True)['last_insert_rowid()']
         else:
             current = current['id']
 
@@ -111,6 +111,19 @@ def process_tags(entry_id, tags_list):
                       VALUES (?, ?)',
                       (entry_id, current))
     g.db.commit()
+
+def get_entry_tags(entry_id):
+    """
+    Convenience function which returns a list of tag names for an 
+    entry. It is useful for templating purposes (i.e. displaying
+    all entry's tags)
+    """
+    rv=query_db('SELECT tag.name FROM tag \
+                 JOIN entry_tags ON tag.id = entry_tags.id_tag_FK \
+                 JOIN entry ON entry_tags.id_entry_FK = entry.id \
+                 WHERE entry.id = ?',
+                 entry_id)
+    return rv
 
 
 @app.before_request
@@ -120,7 +133,8 @@ def before_request():
     looks up the current user.
     """
     g.db = connect_db()
-    g.user = None
+    g.user = None 
+    
     if 'user_id' in session:
         g.user = query_db(
                  'SELECT user.id, user.username, rank.id, rank.role_name \
@@ -140,8 +154,17 @@ def after_request(response):
 @app.route('/')
 def list_entries():
     entries = query_db(
-              'SELECT slug, title, body, last_date, creation_date \
+              'SELECT id, slug, title, body, last_date, creation_date \
                FROM entry')
+    # Add tags
+    for entry in entries:
+        rs = g.db.execute(
+             'SELECT tag.name FROM tag \
+              JOIN entry_tags ON tag.id = entry_tags.id_tag_FK \
+              WHERE entry_tags.id_entry_FK = ?',
+              [entry['id']])
+        entry['tags'] = [item[0] for item in rs.fetchall()]
+
     return render_template("list_entries.html", entries=entries)
 
 

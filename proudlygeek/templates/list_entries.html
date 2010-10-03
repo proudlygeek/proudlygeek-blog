@@ -4,11 +4,16 @@
   {% for entry in entries %}
   {% set year, month, day = entry.creation_date.split('-') %}
   <li>
-    <h2><a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a></h2>
-      {{ entry.creation_date }} {{ entry.body|safe }}
-    {% else %}
-    <em>Unbelievable. No entries here so far</em>
-    {% endfor %}
-    </li>
-  </ul>
+  <h2>
+    <a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a>
+  {% for tag in entry.tags %}
+    <small>{{ tag }}</small>
+  {% endfor %}
+  </h2>
+    {{ entry.creation_date }} {{ entry.body|safe }} 
+  {% else %}
+  <em>Unbelievable. No entries here so far</em>
+  {% endfor %}
+  </li>
+</ul>
 {% endblock %}
