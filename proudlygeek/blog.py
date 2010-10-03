@@ -112,18 +112,21 @@ def process_tags(entry_id, tags_list):
                       (entry_id, current))
     g.db.commit()
 
-def get_entry_tags(entry_id):
+
+def fill_tags(entries):
     """
-    Convenience function which returns a list of tag names for an 
-    entry. It is useful for templating purposes (i.e. displaying
-    all entry's tags)
+    Convenience function which retrieves all the tags and 
+    inserts them in the right entry dictionary. 
+    This is useful for templating purposes (i.e. displaying
+    all entry's tags near the title of the entry).
     """
-    rv=query_db('SELECT tag.name FROM tag \
-                 JOIN entry_tags ON tag.id = entry_tags.id_tag_FK \
-                 JOIN entry ON entry_tags.id_entry_FK = entry.id \
-                 WHERE entry.id = ?',
-                 entry_id)
-    return rv
+    for entry in entries:
+        rs = g.db.execute(
+             'SELECT tag.name FROM tag \
+              JOIN entry_tags ON tag.id = entry_tags.id_tag_FK \
+              WHERE entry_tags.id_entry_FK = ?',
+              [entry['id']])
+        entry['tags'] = [item[0] for item in rs.fetchall()]
 
 
 @app.before_request
@@ -157,13 +160,7 @@ def list_entries():
               'SELECT id, slug, title, body, last_date, creation_date \
                FROM entry')
     # Add tags
-    for entry in entries:
-        rs = g.db.execute(
-             'SELECT tag.name FROM tag \
-              JOIN entry_tags ON tag.id = entry_tags.id_tag_FK \
-              WHERE entry_tags.id_entry_FK = ?',
-              [entry['id']])
-        entry['tags'] = [item[0] for item in rs.fetchall()]
+    fill_tags(entries)
 
     return render_template("list_entries.html", entries=entries)
 
@@ -262,6 +259,7 @@ def view_entry(year, month, day, title):
         abort(404)
 
     else:
+        fill_tags([entry])
         return render_template('entry.html', entry=entry)
 
 if __name__ == "__main__":
