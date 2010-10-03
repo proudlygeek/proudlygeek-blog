@@ -25,9 +25,9 @@ CREATE TABLE entry (
 
 DROP TABLE IF EXISTS entry_tags;
 CREATE TABLE entry_tags (
-	id_entry_FK INTEGER REFERENCES entry(id),
+	slug_entry_FK INTEGER REFERENCES entry(id),
 	id_tag_FK INTEGER REFERENCES tag(id),
-	PRIMARY KEY(id_entry_FK, id_tag_FK)
+	PRIMARY KEY(slug_entry_FK, id_tag_FK)
 );
 
 DROP TABLE IF EXISTS tag;

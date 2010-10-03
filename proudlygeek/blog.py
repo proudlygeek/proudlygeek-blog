@@ -86,6 +86,32 @@ def slugify_entry(entry_title, delim=u'-'):
             result.append(word)
     return unicode(delim.join(result))
 
+def process_tags(entry_id, tags_list):
+    """
+    For each tag into tags_list it retrieves it's id from the database;
+    if a supplied tag is not recorded then it creates a new database record.
+    """
+    print tags_list
+    for tag in tags_list:
+        current=query_db('SELECT id from tag \
+                          WHERE tag.name = ?',
+                          [tag],
+                          one=True)
+
+        if current is None:
+            g.db.execute('INSERT INTO tag \
+                          VALUES (null, ?)',
+                          [tag])
+
+            current = query_db('SELECT last_insert_rowid()', one=True)['last_insert_rowid()']
+        else:
+            current = current['id']
+
+        g.db.execute('INSERT INTO entry_tags \
+                      VALUES (?, ?)',
+                      (entry_id, current))
+    g.db.commit()
+
 
 @app.before_request
 def before_request():
@@ -178,8 +204,12 @@ def add_entry():
                  request.form['entry_text'],
                  today.strftime('%Y-%m-%d'),
                  g.user['id']))
-
+                
                 g.db.commit()
+                lastid = query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
+                if request.form['tags'] !='':
+                    process_tags(lastid, request.form['tags'].split())
+
                 flash('Entry added.')
                 return redirect(url_for('list_entries'))
 

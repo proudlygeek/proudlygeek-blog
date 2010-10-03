@@ -16,21 +16,22 @@ CREATE TABLE rank (
 
 DROP TABLE IF EXISTS entry;
 CREATE TABLE entry (
-	id INTEGER,
+	id INTEGER PRIMARY KEY autoincrement,
     slug VARCHAR(80) NOT NULL,
 	title VARCHAR(80) NOT NULL,
 	body TEXT NOT NULL,
 	creation_date DATE NOT NULL,
 	last_date DATE,
-	user_id_FK INTEGER NOT NULL REFERENCES user(id),
-    PRIMARY KEY(id, slug)
+	user_id_FK INTEGER NOT NULL REFERENCES user(id)
 );
+
 DROP TABLE IF EXISTS entry_tags;
 CREATE TABLE entry_tags (
 	id_entry_FK INTEGER REFERENCES entry(id),
 	id_tag_FK INTEGER REFERENCES tag(id),
 	PRIMARY KEY(id_entry_FK, id_tag_FK)
 );
+
 DROP TABLE IF EXISTS tag;
 CREATE TABLE tag (
 	id INTEGER PRIMARY KEY autoincrement,
