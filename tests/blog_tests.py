@@ -147,5 +147,23 @@ class BlogTestCase(unittest.TestCase):
         rv = self.view_entry('9999999','13','40','test-title')
         assert '400 Bad Request' in rv.data
 
+    def test_admin_panel(self):
+        """Tests if access is granted correctly to the admin panel."""
+        # Access with no login
+        rv = self.app.get('/admin', follow_redirects=True)
+        assert 'Please login' in rv.data
+        # Login with administrator
+        self.login('test', 'test')
+        rv = self.app.get('/admin')
+        assert 'Administration Panel' in rv.data
+        # Logout
+        self.logout()
+        # Login with normal user
+        self.login('user', 'test')
+        rv = self.app.get('/admin')
+        assert 'Administration Panel' not in rv.data
+
+
+
 if __name__ == '__main__':
     unittest.main()

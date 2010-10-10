@@ -128,6 +128,22 @@ def fill_tags(entries):
               [entry['id']])
         entry['tags'] = [item[0] for item in rs.fetchall()]
 
+def fill_author(entries):
+    """
+    Convenience function which insert the author's name into
+    the dictionary structure passed by default.
+    This is useful for templating purpose.
+    """
+    for entry in entries:
+        rs = g.db.execute(
+             """
+             SELECT user.username 
+             FROM user
+             WHERE user.id = ?
+             """,
+             [entry['user_id_FK']])
+        entry['author'] = rs.fetchall()[0][0]
+
 
 @app.before_request
 def before_request():
@@ -140,12 +156,14 @@ def before_request():
     
     if 'user_id' in session:
         g.user = query_db(
-                 'SELECT user.id, user.username, rank.id, rank.role_name \
-                  FROM user join rank on user.rank_id_FK = rank.id \
-                  WHERE user.id = ?',
-                  [session['user_id']],
-                  one=True)
-
+                 """
+                 SELECT user.id, rank.role_name
+                 FROM user, rank 
+                 WHERE user.rank_id_FK = rank.id
+                 AND user.id = ?
+                 """, 
+                 [session['user_id']], 
+                 one=True)
 
 @app.after_request
 def after_request(response):
@@ -157,10 +175,15 @@ def after_request(response):
 @app.route('/')
 def list_entries():
     entries = query_db(
-              'SELECT id, slug, title, body, last_date, creation_date \
-               FROM entry')
+              """
+              SELECT id, slug, title, body, last_date, 
+                     creation_date, user_id_FK
+              FROM entry
+              """)
     # Add tags
     fill_tags(entries)
+    # Add author
+    fill_author(entries)
 
     return render_template("list_entries.html", entries=entries)
 
@@ -224,7 +247,7 @@ def add_entry():
                  request.form['entry_text'],
                  today.strftime('%Y-%m-%d'),
                  g.user['id']))
-                
+ 
                 g.db.commit()
                 lastid = query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
                 if request.form['tags'] !='':
@@ -277,6 +300,27 @@ def list_entries_by_tag(tagname):
 
     fill_tags(entries)
     return render_template("list_entries.html", entries=entries)
+
+@app.route('/admin')
+def admin_panel():
+    """Display a panel for administration purposes."""
+    if g.user is not None:
+        if g.user['role_name'] == 'administrator':
+            entries_list = query_db(
+                           """
+                           SELECT id, user_id_FK, slug, title 
+                           FROM entry
+                           """)
+            fill_tags(entries_list)
+            fill_author(entries_list)
+
+            return render_template('admin.html', entries=entries_list)
+
+        else:
+            return redirect(url_for('list_entries'))
+    else:
+        return redirect(url_for('login'))
+
 
 if __name__ == "__main__":
     app.run()
