@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block body %}
+<h2> Administration Panel </h2>
+<table>
+  <caption> Entries </caption>
+  <thead>
+    <th scope = col>id</th>
+    <th scope = col>slug</th>
+    <th scope = col>author</th>
+    <th scope = col>title</th>
+    <th scope = col>tag(s)</th>
+  <tbody>
+  {% for entry in entries %}
+    <tr>
+      <td>{{entry.id}}</td>
+      <td>{{entry.slug}}</td>
+      <td>{{entry.author}}
+      <td>{{entry.title}}</td>
+      <td>
+      {% for tag in entry.tags %}
+        {{tag}}
+      {% else %}
+        -
+      {% endfor %}
+     </td>
+    </tr>
+  {% else %}
+    <tr> No entries </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

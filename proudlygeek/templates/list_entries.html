@@ -1,20 +1,18 @@
 {% extends "layout.html" %}
 {% block body %}
-<ul class=entries>
+<div id= "entries">
   {% for entry in entries %}
   {% set year, month, day = entry.creation_date.split('-') %}
-  <li>
-  <h2>
+  <header>
     <a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a>
   {% for tag in entry.tags %}
     <small>{{ tag }}</small>
   {% endfor %}
-  </h2>
-  <small>On {{ entry.creation_date }} {{entry.author}} wrote:</small>
+  <p><small>On {{ entry.creation_date }} {{entry.author}} wrote:</small></p>
+  </header>
   <p>{{ entry.body|safe }}</p>
   {% else %}
   <em>Unbelievable. No entries here so far</em>
   {% endfor %}
-  </li>
-</ul>
+</div>
 {% endblock %}
