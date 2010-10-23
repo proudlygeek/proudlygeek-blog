@@ -1,18 +1,31 @@
 {% extends "layout.html" %}
 {% block body %}
-<div id= "entries">
-  {% for entry in entries %}
+<div id = "entries">
+{% for entry in entries %}
+  <div class = "entry">
   {% set year, month, day = entry.creation_date.split('-') %}
-  <header>
-    <a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a>
-  {% for tag in entry.tags %}
-    <small>{{ tag }}</small>
-  {% endfor %}
-  <p><small>On {{ entry.creation_date }} {{entry.author}} wrote:</small></p>
-  </header>
-  <p>{{ entry.body|safe }}</p>
-  {% else %}
-  <em>Unbelievable. No entries here so far</em>
+    <div id = "entry_title">
+      <h2><a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a></h2>
+    </div>
+    <ul class = "tags">
+    {% for tag in entry.tags %}
+      <li>
+        <a rel = "tag" href ="{{url_for('list_entries_by_tag', tagname=tag)}}">{{ tag }}</a>
+      </li>
+    {% endfor %}
+    </ul>
+    <div id = "entry_body">
+      <div class = "date">
+        <p>{{ entry.creation_date }}</p>
+      </div>
+      <div id = "text">
+        <p>{{ entry.body|safe }}</p>
+      </div>
+    </div>
+  </div>
+      {% else %}
+    <em>Unbelievable. No entries here so far</em>
+  </div>
   {% endfor %}
 </div>
 {% endblock %}

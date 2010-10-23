@@ -2,7 +2,91 @@
 Custom CSS
 */
 
-body {background-color:#EBF2DF}
+body 
+{
+    background-color:#EBF2DF
+}
 
-#entries {background-color:#F5F8F1; width:500px;margin:auto;-moz-border-radius:20px;padding:20px;-moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.17);}
+#entries .entry
+{
+    margin-bottom:10px;
+}
+#entries 
+{
+    background-color:#F5F8F1; 
+    width:800px;
+    margin:auto;
+    -moz-border-radius:20px;
+    padding:20px;
+    /*-moz-box-shadow: 0 0 3px */
+    border:2px #E2E8DA solid;
+    rgba(0, 0, 0, 0.17);
+}
+
+#entries li, #entries p
+{
+    line-height:1.5em;
+}
+
+#entry_title 
+{
+    float:left;
+    font-size:1.375em;
+    margin-left:103px;
+    margin-right:20px;
+}
+
+#entry_title h2 a
+{
+    color:black;
+    text-decoration:none;
+}
+
+#entry_title h2 a:hover
+{
+    text-decoration:underline;
+}
+
+#entries .tags 
+{
+    list-style: none outside none;
+    margin-left:0;
+    overflow: hidden;
+    width:100%;
+}
+
+#entries .tags li
+{
+    float:left;
+    margin-right:5px;
+}
+
+#entries .tags li a
+{
+    -moz-border-radius: 4px 4px 4px 4px;
+    border:1px #93968E solid;
+    background: none repeat scroll 0 0 #FFFFFF;
+    color: #000000;
+    font-weight:bold;
+    display:block;
+    font-size:75%;
+    padding:2px 10px 2px 10px;
+    text-decoration:none;
+}
+
+#entries .tags li a:hover
+{
+    text-decoration:underline;
+}
+
+#entries .date
+{
+    margin-left:0;
+    float:left;
+    padding:2px 5px;
+    margin-right:20px;
+    background-color:#C5C5C7;
+    -moz-border-radius:3px 3px 0 0;
+
+}
 
