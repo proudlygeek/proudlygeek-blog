@@ -92,10 +92,10 @@ class BlogTestCase(unittest.TestCase):
         assert "Enter your message:" in rv.data
         rv = self.add_entry('Test Title', 'this is a test!')
         # Testing the correctness of the inserted data
-        assert """%s this is a test!""" \
-               % (today.strftime('%Y-%m-%d')) in rv.data
+        assert """<p>%s</p>""" % (today.strftime('%Y-%m-%d')) in rv.data
         assert """<a href = /articles/%s/%s/%s/%s>Test Title</a>""" \
                % (today.year, today.month, today.day, 'this-is-a-test')
+        assert """<p>this is a test!</p>""" in rv.data
         # Testing BLANK Title
         rv = self.add_entry('','this is a test!')
         assert 'No title supplied' in rv.data

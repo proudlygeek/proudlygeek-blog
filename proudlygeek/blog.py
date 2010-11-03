@@ -130,7 +130,7 @@ def fill_tags(entries):
 
 def fill_author(entries):
     """
-    Convenience function which insert the author's name into
+    Convenience function which inserts the author's name into
     the dictionary structure passed by default.
     This is useful for templating purpose.
     """
@@ -143,6 +143,23 @@ def fill_author(entries):
              """,
              [entry['user_id_FK']])
         entry['author'] = rs.fetchall()[0][0]
+
+def fill_humanized_dates(entries):
+    """
+    Convenience function which inserts a humanized date
+    into the passed entries dictionary.
+    """
+    for entry in entries:
+        entry['human_date'] = humanize_date(entry['creation_date'])
+
+def humanize_date(date_string):
+    """
+    Converts numerics date to a more friendly form;
+    given a numeric date formatted as "<Year>-<Month>-<Day>""
+    it returns the string "<Month Name> <Day>".
+    """
+    date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
+    return date.strftime('%d %b').upper()
 
 
 @app.before_request
@@ -179,11 +196,14 @@ def list_entries():
               SELECT id, slug, title, body, last_date, 
                      creation_date, user_id_FK
               FROM entry
+              ORDER BY creation_date DESC 
               """)
+    # Add humanized post date
+    fill_humanized_dates(entries)
     # Add tags
     fill_tags(entries)
     # Add author
-    fill_author(entries)
+    #fill_author(entries)
 
     return render_template("list_entries.html", entries=entries)
 
@@ -282,7 +302,9 @@ def view_entry(year, month, day, title):
         abort(404)
     else:
         fill_tags([entry])
-        return render_template('entry.html', entry=entry)
+        #fill_author([entry])
+        fill_humanized_dates([entry])
+        return render_template('list_entries.html', entries=[entry])
 
 
 @app.route('/tags/<tagname>')
@@ -299,6 +321,8 @@ def list_entries_by_tag(tagname):
               [tagname])
 
     fill_tags(entries)
+    #fill_author(entries)
+    fill_humanized_dates(entries)
     return render_template("list_entries.html", entries=entries)
 
 @app.route('/admin')
