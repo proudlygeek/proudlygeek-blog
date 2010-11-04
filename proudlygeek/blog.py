@@ -46,6 +46,7 @@ def init_db(testdb=False):
         schema = 'schema.sql'
     else:
         schema = '../tests/test_db.sql'
+        DATABASE = 'blog.db'
 
     with closing(connect_db()) as db:
         with app.open_resource(schema) as f:
