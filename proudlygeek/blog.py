@@ -12,13 +12,14 @@
 
 """
 from flask import Flask, request, session, g, url_for, redirect, \
-     render_template, abort, flash
+     render_template, abort, flash, Markup
 from contextlib import closing
 
 import sqlite3
 import hashlib
 import datetime
 import re
+import markdown
 from unicodedata import normalize
 from config import mode
 
@@ -152,6 +153,15 @@ def fill_humanized_dates(entries):
     for entry in entries:
         entry['human_date'] = humanize_date(entry['creation_date'])
 
+def fill_markdown_content(entries):
+    """
+    Convenience function which converts entry's body Markdown
+    syntax to HTML code.
+    """
+    for entry in entries:
+        entry['content'] = Markup(markdown.markdown(entry['body']))
+
+
 def humanize_date(date_string):
     """
     Converts numerics date to a more friendly form;
@@ -160,6 +170,21 @@ def humanize_date(date_string):
     """
     date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
     return date.strftime('%d %b').upper()
+
+def fill_entries(entries):
+    """
+    Convenience function which inserts several new fields
+    into the entries dict (see above).
+    """
+    # Add humanized post date
+    fill_humanized_dates(entries)
+    # Add tags
+    fill_tags(entries)
+    # Add Markdown entry
+    fill_markdown_content(entries)
+    # Add author
+    #fill_author(entries)
+
 
 
 @app.before_request
@@ -196,15 +221,10 @@ def list_entries():
               SELECT id, slug, title, body, last_date, 
                      creation_date, user_id_FK
               FROM entry
-              ORDER BY creation_date DESC 
+              ORDER BY creation_date DESC, id DESC 
               """)
-    # Add humanized post date
-    fill_humanized_dates(entries)
-    # Add tags
-    fill_tags(entries)
-    # Add author
-    #fill_author(entries)
 
+    fill_entries(entries)
     return render_template("list_entries.html", entries=entries)
 
 
@@ -301,9 +321,7 @@ def view_entry(year, month, day, title):
     if entry is None:
         abort(404)
     else:
-        fill_tags([entry])
-        #fill_author([entry])
-        fill_humanized_dates([entry])
+        fill_entries([entry])
         return render_template('list_entries.html', entries=[entry])
 
 
@@ -317,12 +335,10 @@ def list_entries_by_tag(tagname):
               JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
               JOIN tag ON entry_tags.id_tag_FK = tag.id
               WHERE tag.name = ?
+              ORDER BY entry.creation_date DESC, entry.id DESC
               """,
               [tagname])
-
-    fill_tags(entries)
-    #fill_author(entries)
-    fill_humanized_dates(entries)
+    fill_entries(entries)
     return render_template("list_entries.html", entries=entries)
 
 @app.route('/admin')
