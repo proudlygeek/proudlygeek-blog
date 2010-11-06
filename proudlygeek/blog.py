@@ -154,13 +154,40 @@ def fill_humanized_dates(entries):
     for entry in entries:
         entry['human_date'] = humanize_date(entry['creation_date'])
 
+def generate_readmore(entry, single=False):
+    """
+    Replaces any <hr /> tag with an URL to the full entry's text
+    and strips down the current entry's text to make a summary.
+    """
+    year, month, day = entry['creation_date'].split('-')
+    entry_url = """<a class="readmore" href="%s"> Read more about "%s"...</a>""" \
+                 % (url_for('view_entry', year=year, month=month, day=day, 
+                 title=entry['slug']), entry['title'])
+
+    strip_index = entry['content'].find("""<hr />""")
+    
+    # Stripping down text and appending the generated URL
+    if strip_index > 0:
+        if single:
+            entry['content'] = entry['content'][:strip_index] + Markup("""<br />""") + entry['content'][strip_index+6:]
+        else:
+            entry['content'] = entry['content'][:strip_index] + Markup(entry_url)
+
+
 def fill_markdown_content(entries):
     """
     Convenience function which converts entry's body Markdown
     syntax to HTML code.
     """
+    if len(entries) == 1:
+        single = True
+    else:
+        single = False
+
     for entry in entries:
         entry['content'] = Markup(markdown.markdown(entry['body']))
+        generate_readmore(entry, single)
+
 
 
 def humanize_date(date_string):
@@ -171,6 +198,7 @@ def humanize_date(date_string):
     """
     date = datetime.datetime.strptime(date_string, '%Y-%m-%d')
     return date.strftime('%d %b').upper()
+
 
 def fill_entries(entries):
     """
