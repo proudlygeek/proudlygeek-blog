@@ -14,7 +14,8 @@ pre
 
 #entries .entry
 {
-    margin-bottom:50px;
+    margin-top:25px;
+    margin-bottom:25px;
     overflow:hidden;
 }
 #entries 
@@ -64,6 +65,7 @@ pre
 {
     float:left;
     margin-right:5px;
+    margin-bottom:5px;
 }
 
 #entries .tags li a
@@ -111,23 +113,41 @@ pre
 
 #text .left
 {
-    clear:left;
+    /*clear:left;*/
     float:left;
-    margin: -0.7em 1em -0.7em 0em;
-    max-width:50%;
+    padding:3px;
+    margin: 0em 1.5em 1em 0em;
+    max-width:40%;
+}
+
+#text p img
+{
+    line-height:normal;
 }
 
 #text .center
 {
     display:block;
-    clear:both;
-    margin-left:auto;
-    margin-right:auto;
+    /*clear:both;*/
+   /*margin: 0em 1em 1em 0em;*/
+    margin: 0 auto 1em;
     max-width:100%;
+    padding:3px;
 }
 
 #text .readmore
 {
   clear:left;
   float:left;
+  margin-top:10px;
+}
+
+#text hr
+{
+    margin-top:43px;
+}
+
+#entries .pagination
+{
+    text-align:center;  
 }

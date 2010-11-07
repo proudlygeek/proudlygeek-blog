@@ -16,6 +16,7 @@ from flask import Flask, request, session, g, url_for, redirect, \
 from contextlib import closing
 
 import sqlite3
+import math
 import hashlib
 import datetime
 import re
@@ -173,6 +174,8 @@ def generate_readmore(entry, single=False):
         else:
             entry['content'] = entry['content'][:strip_index] + Markup(entry_url)
 
+    # Add a separator at the end of the post
+    entry['content'] = entry['content'] + Markup("""<hr />""")
 
 def fill_markdown_content(entries):
     """
@@ -214,6 +217,33 @@ def fill_entries(entries):
     # Add author
     #fill_author(entries)
 
+def entry_pages():
+    """
+    Returns the minimum amount of pages needed for displaying
+    a certain amount of entries (defined into the config var
+    MAX_PAGE_ENTRIES).
+
+    The used formula is:
+              __                     __
+             |     # Total Entries     |
+        CEIL |   -------------------   |
+             |   # MAX_PAGE_ENTRIES    |
+    """
+    total_entries = query_db(
+                    """
+                    SELECT COUNT(*)
+                    FROM entry
+                    """,
+                    one=True)['COUNT(*)']
+
+    max_page_entries = app.config['MAX_PAGE_ENTRIES']*1.0
+
+    try:
+        entry_pages = int(math.ceil(total_entries/max_page_entries))
+    except ZeroDivisionError as Err:
+        print "Critical Error (Is MAX_PAGE_ENTRIES zero?): %s" % (Err)
+
+    return entry_pages
 
 
 @app.before_request
@@ -245,16 +275,33 @@ def after_request(response):
 
 @app.route('/')
 def list_entries():
+    """
+    Returns a list of entries in the form of pages containing
+    MAX_PAGE_ENTRIES entries;
+    the default page argument, being ``1'', refers to the latest
+    MAX_PAGE_ENTRIES entries.
+    """
+    if 'page' in request.args:
+        page = int(request.args['page'])
+    else:
+        page = 1
+
+    # Calculate the right offset
+    offset = app.config['MAX_PAGE_ENTRIES']*(page-1)
     entries = query_db(
               """
               SELECT id, slug, title, body, last_date, 
                      creation_date, user_id_FK
               FROM entry
               ORDER BY creation_date DESC, id DESC 
-              """)
+              LIMIT %d OFFSET %d
+              """ % (app.config['MAX_PAGE_ENTRIES'], offset))
+    # This happens when trying to access a non-existent page
+    if len(entries) == 0 and page !=1:
+        abort(404)
 
     fill_entries(entries)
-    return render_template("list_entries.html", entries=entries)
+    return render_template("list_entries.html", entries=entries, pages=entry_pages())
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -263,10 +310,12 @@ def login():
     error = None
     if request.method == 'POST':
         user = query_db(
-               'SELECT * FROM user \
-                WHERE username = ?',
-                [request.form['username']],
-                one=True)
+               """
+               SELECT * FROM user
+               WHERE username = ?
+               """, 
+               [request.form['username']],
+               one=True)
 
         if user is None:
             error = 'Invalid username'
@@ -337,8 +386,6 @@ def view_entry(year, month, day, title):
         entrydate = datetime.date(year, month, day)
     except:
         abort(400)
-
-    print "Title: %s; Date: %s" % (title, entrydate)
 
     entry = query_db(
             'SELECT * FROM entry \
