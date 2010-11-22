@@ -281,9 +281,11 @@ def list_entries():
     the default page argument, being ``1'', refers to the latest
     MAX_PAGE_ENTRIES entries.
     """
-    if 'page' in request.args:
+    try:
         page = int(request.args['page'])
-    else:
+        if page <= 0:
+            page = 1
+    except:
         page = 1
 
     # Calculate the right offset
@@ -301,7 +303,7 @@ def list_entries():
         abort(404)
 
     fill_entries(entries)
-    return render_template("list_entries.html", entries=entries, pages=entry_pages())
+    return render_template("list_entries.html", actual_page=page, entries=entries, pages=entry_pages())
 
 
 @app.route('/login', methods=['GET', 'POST'])

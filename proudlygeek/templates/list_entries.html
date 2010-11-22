@@ -29,12 +29,24 @@
   {% endfor %}
   {% if pages is defined %}
   <div class = "pagination">
-  <span>‹‹ previous</span>
-    {% for number in range(1, pages+1) %}
-    <a href="{{url_for('list_entries', page=number)}}">{{number}}</a>
-    {% endfor %}
-  <span>next ››</span>
+  {% if actual_page == 1 %}
+    <span>‹‹ previous</span>
+  {% else %}
+    <a href={{url_for('list_entries', page=actual_page-1)}}>‹‹ previous</a>
+  {% endif %}
+  {% for number in range(1, pages+1) %}
+    {% if number == actual_page %}
+      <span>{{number}}</span>
+    {% else %}
+      <a href="{{url_for('list_entries', page=number)}}">{{number}}</a>
+    {% endif %}
+  {% endfor %}
+  {% if actual_page == pages %}
+    <span>next ››</span>
+  {% else %}
+    <a href="{{url_for('list_entries', page=actual_page+1)}}">next ››</a>
   </div>
+  {% endif %}
   {% endif %}
 </div>
 {% endblock %}
