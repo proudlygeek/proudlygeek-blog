@@ -12,6 +12,7 @@
 """
 
 import os
+import math
 import unittest
 import tempfile
 import datetime
@@ -163,7 +164,22 @@ class BlogTestCase(unittest.TestCase):
         rv = self.app.get('/admin')
         assert 'Administration Panel' not in rv.data
 
-
+    def test_pagination(self):
+        """
+        Tests if the pagination algorithms works correctly.
+        This test is extremely SLOW.
+        """
+        # Login
+        self.login('test','test')
+        # Add 27 entries
+        for entry in range(27):
+            self.add_entry('Test Title', 'this is a test!','tag1 tag2 tag3')
+        # Check if page numbers are correct
+        entry_pages_check = int(math.ceil(30/blog.app.config['MAX_PAGE_ENTRIES']*1.0))
+        rv = self.app.get('/')
+        print rv.data
+        print entry_pages_check
+        assert str(entry_pages_check) in rv.data
 
 if __name__ == '__main__':
     unittest.main()
