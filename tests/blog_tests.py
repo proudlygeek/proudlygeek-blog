@@ -60,6 +60,10 @@ class BlogTestCase(unittest.TestCase):
                                                        month,
                                                        day,
                                                        slug))
+    def create_sample_entries(self, n=10):
+        """Simply calls add_entry *n* times."""
+        for entry in range(n):
+            self.add_entry('Test Title', 'this is a test!','tag1 tag2 tag3')
 
     def test_empty_db(self):
         """Tests if an initial database is empty."""
@@ -171,15 +175,35 @@ class BlogTestCase(unittest.TestCase):
         """
         # Login
         self.login('test','test')
-        # Add 27 entries
-        for entry in range(27):
-            self.add_entry('Test Title', 'this is a test!','tag1 tag2 tag3')
+        # Create 27 entries
+        self.create_sample_entries(27)
         # Check if page numbers are correct
-        entry_pages_check = int(math.ceil(30/blog.app.config['MAX_PAGE_ENTRIES']*1.0))
+        entry_pages_check = int(math.ceil(27/blog.app.config['MAX_PAGE_ENTRIES']*1.0))
         rv = self.app.get('/')
         print rv.data
         print entry_pages_check
         assert str(entry_pages_check) in rv.data
+
+    def test_get_page(self):
+        """
+        Tests various combinations of the '?page=' GET parameter
+        normally used in the the list_entries methods.
+        """
+        # Login
+        self.login('test','test')
+        # Create sample entries
+        self.create_sample_entries(10)
+        # GET test #1: Request existing page
+        rv = self.app.get('/?page=2', follow_redirects=True)
+        assert "pagination" in rv.data
+        # GET test #2: Request negative page
+        rv = self.app.get('/?page=-1', follow_redirects=True)
+        assert "pagination" in rv.data
+        # GET test #3: Request non-existing page
+        rv = self.app.get('/?page=3', follow_redirects=True)
+        print rv.data
+        assert "404 Not Found" in rv.data 
+
 
 if __name__ == '__main__':
     unittest.main()
