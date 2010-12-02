@@ -217,6 +217,7 @@ def fill_entries(entries):
     # Add author
     #fill_author(entries)
 
+
 def entry_pages():
     """
     Returns the minimum amount of pages needed for displaying
@@ -245,6 +246,7 @@ def entry_pages():
 
     return entry_pages
 
+
 def split_pages(currentpage, totalpages):
     """
     Splits a certain number of pages into several
@@ -270,6 +272,34 @@ def split_pages(currentpage, totalpages):
             return pag[:4], pag[currentpage-5:]
         else:
             return pag[:4],pag[currentpage-5:currentpage+3], pag[len(pag)-4:]
+
+
+def unpack_pages(pages):
+    """
+    Turns a tuple of several lists obtained from the split_pages function 
+    (see above) into a plain list;
+
+    for example, the following tuple:
+
+    ([1, 2, 3, 4], [27, 28, 29, 30, 31, 32, 33, 34], [112, 113, 114, 115])
+
+    returns this list:
+
+    [1, 2, 3, 4, '...', 27, 28, 29, 30, 31, 32, 33, 34, '...', 112, 113, 114, 115]
+    """
+    # Duck Typing: If it is a plain tuple there's no need to unpack
+    try:
+        pages[0][0]
+    except TypeError:
+        return pages
+
+    plainlist = []
+    for page in pages:
+        for item in page:
+            plainlist.append(item)
+        if item != pages[-1][-1]: plainlist.append("...")
+    return plainlist
+
 
 @app.before_request
 def before_request():
@@ -323,15 +353,16 @@ def list_entries():
               ORDER BY creation_date DESC, id DESC 
               LIMIT %d OFFSET %d
               """ % (app.config['MAX_PAGE_ENTRIES'], offset))
+
     # This happens when trying to access a non-existent page
-    if len(entries) == 0 and page !=1:
+    if len(entries) == 0 and page !=1: 
         abort(404)
+
     # Filling entries
     fill_entries(entries)
 
     # Splitting pages
-    splitted_pages = split_pages(page, entry_pages())
-    print splitted_pages
+    splitted_pages = unpack_pages(split_pages(page, entry_pages()))
 
     # Jinja2 render
     return render_template("list_entries.html", actual_page=page, entries=entries, pages=splitted_pages)

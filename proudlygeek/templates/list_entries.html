@@ -34,14 +34,14 @@
   {% else %}
     <a href={{url_for('list_entries', page=actual_page-1)}}>‹‹ previous</a>
   {% endif %}
-  {% for number in range(1, pages+1) %}
-    {% if number == actual_page %}
-      <span>{{number}}</span>
+  {% for page in pages %}
+    {% if page == actual_page or page == '...' %}
+      <span>{{page}}</span>
     {% else %}
-      <a href="{{url_for('list_entries', page=number)}}">{{number}}</a>
+      <a href="{{url_for('list_entries', page=page)}}">{{page}}</a>
     {% endif %}
   {% endfor %}
-  {% if actual_page == pages %}
+  {% if actual_page == pages|count %}
     <span>next ››</span>
   {% else %}
     <a href="{{url_for('list_entries', page=actual_page+1)}}">next ››</a>
