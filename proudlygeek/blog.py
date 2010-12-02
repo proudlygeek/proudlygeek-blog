@@ -245,6 +245,31 @@ def entry_pages():
 
     return entry_pages
 
+def split_pages(currentpage, totalpages):
+    """
+    Splits a certain number of pages into several
+    lists; for example, if the current page is 31 on a total of 115
+    pages the return tuple is: 
+    
+    ([1, 2, 3, 4], [27, 28, 29, 30, 31, 32, 33, 34], [112, 113, 114, 115])
+    """
+    # Check if currentpage is less than the total
+    if currentpage > totalpages:
+        raise NameError('The actual page value {0} is more than {1}.'.format(currentpage, totalpages))
+
+    # Creates an ordered list of *totalpages* dimension
+    pag = [number+1 for number in range(totalpages)]
+
+    # If the total size is less than 18 then there's no need to split
+    if len(pag) < 18:
+        return pag
+    else:
+        if (currentpage in pag[:10]):
+            return (pag[:currentpage+3], pag[len(pag)-4:])
+        elif (currentpage in pag[len(pag)-9:]):
+            return pag[:4], pag[currentpage-5:]
+        else:
+            return pag[:4],pag[currentpage-5:currentpage+3], pag[len(pag)-4:]
 
 @app.before_request
 def before_request():
@@ -301,9 +326,15 @@ def list_entries():
     # This happens when trying to access a non-existent page
     if len(entries) == 0 and page !=1:
         abort(404)
-
+    # Filling entries
     fill_entries(entries)
-    return render_template("list_entries.html", actual_page=page, entries=entries, pages=entry_pages())
+
+    # Splitting pages
+    splitted_pages = split_pages(page, entry_pages())
+    print splitted_pages
+
+    # Jinja2 render
+    return render_template("list_entries.html", actual_page=page, entries=entries, pages=splitted_pages)
 
 
 @app.route('/login', methods=['GET', 'POST'])
