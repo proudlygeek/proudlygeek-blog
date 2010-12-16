@@ -358,9 +358,11 @@ def list_entries():
               ORDER BY creation_date DESC, id DESC 
               LIMIT %d OFFSET %d
               """ % (app.config['MAX_PAGE_ENTRIES'], offset))
+
     # This happens when trying to access a non-existent page
-    if len(entries) == 0 and page !=1:
+    if len(entries) == 0 and page !=1: 
         abort(404)
+
     # Filling entries
     fill_entries(entries)
 
