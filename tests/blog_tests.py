@@ -202,7 +202,44 @@ class BlogTestCase(unittest.TestCase):
         # GET test #3: Request non-existing page
         rv = self.app.get('/?page=3', follow_redirects=True)
         print rv.data
-        assert "404 Not Found" in rv.data 
+        assert "404 Not Found" in rv.data
+
+    def test_split_unpack(self):                                              
+        """
+        Tests if pagination splitting/unpacking is working correctly          
+        using every time a different number of entries.
+        This test assumes that MAX_PAGES_ENTRIES = 5 (See config)
+        """
+        # Login
+        self.login('test','test')
+        # Create eight entries                      
+        self.create_sample_entries(8)
+        # It is expecting two pages like this -> ‹‹ previous 1 2 next ›› 
+        rv = self.app.get('/')
+        assert """<div class = "pagination">\n  \n    """ in rv.data
+        assert """<span>\xe2\x80\xb9\xe2\x80\xb9 previous</span>\n  \n  \n    \n      """ in rv.data
+        assert """<span>1</span>\n    \n  \n    \n      """ in rv.data
+        assert """<a href="/?page=2">2</a>\n    \n  \n  \n    """ in rv.data
+        assert """<a href="/?page=2">next \xe2\x80\xba\xe2\x80\xba</a>\n  </div>""" in rv.data
+        # Add eighty-two more entries to trigger pagination split functions -> (82+8)/5 = 18
+        self.create_sample_entries(82)
+        # Expecting this pagination -> ‹‹ previous 1 2 3 4 ... 15 16 17 18 next ››
+        rv = self.app.get('/')
+        print rv.data
+        assert """<div class = "pagination">\n  \n    """ in rv.data
+        assert """<span>\xe2\x80\xb9\xe2\x80\xb9 previous</span>\n  \n  \n    \n""" in rv.data
+        assert """<span>1</span>\n    \n  \n    \n""" in rv.data
+        assert """<a href="/?page=2">2</a>\n    \n  \n    \n""" in rv.data      
+        assert """<a href="/?page=3">3</a>\n    \n  \n    \n""" in rv.data      
+        assert """<a href="/?page=4">4</a>\n    \n  \n    \n""" in rv.data      
+        assert """<span>...</span>\n    \n  \n    \n""" in rv.data      
+        assert """<a href="/?page=15">15</a>\n    \n  \n    \n""" in rv.data
+        assert """<a href="/?page=16">16</a>\n    \n  \n    \n""" in rv.data
+        assert """<a href="/?page=17">17</a>\n    \n  \n    \n""" in rv.data      
+        assert """<a href="/?page=18">18</a>\n    \n  \n  \n""" in rv.data    
+        assert """<a href="/?page=2">next \xe2\x80\xba\xe2\x80\xba</a>\n  </div>""" in rv.data
+
+        # TODO Write all pagination cases
 
 
 if __name__ == '__main__':
