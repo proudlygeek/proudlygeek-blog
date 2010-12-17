@@ -218,7 +218,7 @@ def fill_entries(entries):
     #fill_author(entries)
 
 
-def entry_pages():
+def entry_pages(num_entries):
     """
     Returns the minimum amount of pages needed for displaying
     a certain amount of entries (defined into the config var
@@ -230,17 +230,10 @@ def entry_pages():
         CEIL |   -------------------   |
              |   # MAX_PAGE_ENTRIES    |
     """
-    total_entries = query_db(
-                    """
-                    SELECT COUNT(*)
-                    FROM entry
-                    """,
-                    one=True)['COUNT(*)']
-
     max_page_entries = app.config['MAX_PAGE_ENTRIES']*1.0
 
     try:
-        entry_pages = int(math.ceil(total_entries/max_page_entries))
+        entry_pages = int(math.ceil(num_entries/max_page_entries))
     except ZeroDivisionError as Err:
         print "Critical Error (Is MAX_PAGE_ENTRIES zero?): %s" % (Err)
 
@@ -334,12 +327,15 @@ def after_request(response):
 
 
 @app.route('/')
-def list_entries():
+@app.route('/tags/<tagname>')
+def list_entries(tagname=None):
     """
     Returns a list of entries in the form of pages containing
     MAX_PAGE_ENTRIES entries;
     the default page argument, being ``1'', refers to the latest
     MAX_PAGE_ENTRIES entries.
+
+    Optionally, this method accepts a tagname for tag filtering.
     """
     try:
         page = int(request.args['page'])
@@ -350,14 +346,45 @@ def list_entries():
 
     # Calculate the right offset
     offset = app.config['MAX_PAGE_ENTRIES']*(page-1)
-    entries = query_db(
-              """
-              SELECT id, slug, title, body, last_date, 
-                     creation_date, user_id_FK
-              FROM entry
-              ORDER BY creation_date DESC, id DESC 
-              LIMIT %d OFFSET %d
-              """ % (app.config['MAX_PAGE_ENTRIES'], offset))
+
+    if not tagname:
+        entries = query_db(
+                  """
+                  SELECT id, slug, title, body, last_date, 
+                         creation_date, user_id_FK
+                  FROM entry
+                  ORDER BY creation_date DESC, id DESC 
+                  LIMIT %d OFFSET %d
+                  """ % (app.config['MAX_PAGE_ENTRIES'], offset))
+
+        num_entries = query_db(
+                  """
+                  SELECT COUNT(*)
+                  FROM ENTRY
+                  """,
+                  one=True)['COUNT(*)']
+    else:
+        entries = query_db(
+                  """
+                  SELECT entry.id, entry.slug, entry.title, entry.body, 
+                  entry.last_date,entry.creation_date FROM entry
+                  JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
+                  JOIN tag ON entry_tags.id_tag_FK = tag.id
+                  WHERE tag.name = ?
+                  ORDER BY entry.creation_date DESC, entry.id DESC
+                  """,
+                  [tagname])
+
+        num_entries = query_db(
+                """
+                SELECT COUNT(*)
+                FROM entry
+                JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
+                JOIN tag on entry_tags.id_tag_FK = tag.id
+                WHERE tag.name = ?
+                """,
+                [tagname], one=True)['COUNT(*)']
+
 
     # This happens when trying to access a non-existent page
     if len(entries) == 0 and page !=1: 
@@ -365,12 +392,34 @@ def list_entries():
 
     # Filling entries
     fill_entries(entries)
-
     # Splitting pages
-    splitted_pages = unpack_pages(split_pages(page, entry_pages()))
+    splitted_pages = unpack_pages(split_pages(page, entry_pages(num_entries)))
+
 
     # Jinja2 render
     return render_template("list_entries.html", actual_page=page, entries=entries, pages=splitted_pages)
+
+
+@app.route('/articles/<int:year>/<int:month>/<int:day>/<title>')
+def view_entry(year, month, day, title):
+    """Retrieves an article by date and title."""
+    try:
+        entrydate = datetime.date(year, month, day)
+    except:
+        abort(400)
+
+    entry = query_db(
+            'SELECT * FROM entry \
+             WHERE slug = ? \
+             AND creation_date = ?',
+             [title, entrydate],
+             one=True)
+
+    if entry is None:
+        abort(404)
+    else:
+        fill_entries([entry])
+        return render_template('list_entries.html', entries=[entry])
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -446,45 +495,6 @@ def add_entry():
         return render_template('add_entry.html', errors=errors)
 
     return redirect(url_for('list_entries'))
-
-
-@app.route('/articles/<int:year>/<int:month>/<int:day>/<title>')
-def view_entry(year, month, day, title):
-    """Retrieves an article by date and title."""
-    try:
-        entrydate = datetime.date(year, month, day)
-    except:
-        abort(400)
-
-    entry = query_db(
-            'SELECT * FROM entry \
-             WHERE slug = ? \
-             AND creation_date = ?',
-             [title, entrydate],
-             one=True)
-
-    if entry is None:
-        abort(404)
-    else:
-        fill_entries([entry])
-        return render_template('list_entries.html', entries=[entry])
-
-
-@app.route('/tags/<tagname>')
-def list_entries_by_tag(tagname):
-    """Lists all entries given a tag's name."""
-    entries = query_db(
-              """
-              SELECT entry.id, entry.slug, entry.title, entry.body, 
-              entry.last_date,entry.creation_date FROM entry
-              JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
-              JOIN tag ON entry_tags.id_tag_FK = tag.id
-              WHERE tag.name = ?
-              ORDER BY entry.creation_date DESC, entry.id DESC
-              """,
-              [tagname])
-    fill_entries(entries)
-    return render_template("list_entries.html", entries=entries)
 
 
 @app.route('/admin')

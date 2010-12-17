@@ -10,7 +10,7 @@
     <ul class = "tags">
     {% for tag in entry.tags %}
       <li>
-        <a rel = "tag" href ="{{url_for('list_entries_by_tag', tagname=tag)}}">{{ tag }}</a>
+        <a rel = "tag" href ="{{url_for('list_entries', tagname=tag)}}">{{ tag }}</a>
       </li>
     {% endfor %}
     </ul>
