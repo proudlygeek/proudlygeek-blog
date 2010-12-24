@@ -11,56 +11,26 @@
 
 
 """
+
+from contextlib import closing
+from blog import app
+from lib import factory
+
 from flask import Flask, request, session, g, url_for, redirect, \
      render_template, abort, flash, Markup
-from contextlib import closing
 
-import sqlite3
 import math
 import hashlib
 import datetime
 import re
 import markdown
 from unicodedata import normalize
-from config import mode
 
-# creates the app
-app = Flask(__name__)
-
+# Loading Data Abstract Layer using factory method
 try:
-    # If config.cfg exists then override default config
-    app.config.from_pyfile('config.cfg')
-
-except:
-    # Load Default Config (see config/mode.py)
-    app.config.from_object(mode.DevelopmentConfig)
-
-
-def connect_db():
-    """Returns a new connection to the database."""
-    return sqlite3.connect(app.config['DATABASE'])
-
-
-def init_db(testdb=False):
-    """Creates the database tables."""
-    if not testdb:
-        schema = 'schema.sql'
-    else:
-        schema = '../tests/test_db.sql'
-        DATABASE = 'blog.db'
-
-    with closing(connect_db()) as db:
-        with app.open_resource(schema) as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-
-
-def query_db(query, args=(), one=False):
-    """Queries the database and returns a list of dictionaries."""
-    cur = g.db.execute(query, args)
-    rv = [dict((cur.description[idx][0], value)
-    for idx, value in enumerate(row)) for row in cur.fetchall()]
-    return (rv[0] if rv else None) if one else rv
+    data_layer = factory(app.config['PLATFORM'])
+except NameError as e:
+    print e
 
 
 def check_password_hash(string, check):
@@ -89,13 +59,14 @@ def slugify_entry(entry_title, delim=u'-'):
             result.append(word)
     return unicode(delim.join(result))
 
+
 def process_tags(entry_id, tags_list):
     """
     For each tag into tags_list it retrieves it's id from the database;
     if a supplied tag is not recorded then it creates a new database record.
     """
     for tag in tags_list:
-        current=query_db('SELECT id FROM tag \
+        current=data_layer.query_db('SELECT id FROM tag \
                           WHERE tag.name = ?',
                           [tag],
                           one=True)
@@ -105,7 +76,7 @@ def process_tags(entry_id, tags_list):
                           VALUES (null, ?)',
                           [tag])
 
-            current = query_db('SELECT last_insert_rowid()', 
+            current = data_layer.query_db('SELECT last_insert_rowid()', 
                                 one=True)['last_insert_rowid()']
         else:
             current = current['id']
@@ -131,6 +102,7 @@ def fill_tags(entries):
               [entry['id']])
         entry['tags'] = [item[0] for item in rs.fetchall()]
 
+
 def fill_author(entries):
     """
     Convenience function which inserts the author's name into
@@ -147,6 +119,7 @@ def fill_author(entries):
              [entry['user_id_FK']])
         entry['author'] = rs.fetchall()[0][0]
 
+
 def fill_humanized_dates(entries):
     """
     Convenience function which inserts a humanized date
@@ -154,6 +127,7 @@ def fill_humanized_dates(entries):
     """
     for entry in entries:
         entry['human_date'] = humanize_date(entry['creation_date'])
+
 
 def generate_readmore(entry, single=False):
     """
@@ -177,6 +151,7 @@ def generate_readmore(entry, single=False):
     # Add a separator at the end of the post
     entry['content'] = entry['content'] + Markup("""<hr />""")
 
+
 def fill_markdown_content(entries):
     """
     Convenience function which converts entry's body Markdown
@@ -190,7 +165,6 @@ def fill_markdown_content(entries):
     for entry in entries:
         entry['content'] = Markup(markdown.markdown(entry['body']))
         generate_readmore(entry, single)
-
 
 
 def humanize_date(date_string):
@@ -304,11 +278,11 @@ def before_request():
     Connects to the database before each request and
     looks up the current user.
     """
-    g.db = connect_db()
+    g.db = data_layer.connect_db()
     g.user = None 
     
     if 'user_id' in session:
-        g.user = query_db(
+        g.user = data_layer.query_db(
                  """
                  SELECT user.id, rank.role_name
                  FROM user, rank 
@@ -348,7 +322,7 @@ def list_entries(tagname=None):
     offset = app.config['MAX_PAGE_ENTRIES']*(page-1)
 
     if not tagname:
-        entries = query_db(
+        entries = data_layer.query_db(
                   """
                   SELECT id, slug, title, body, last_date, 
                          creation_date, user_id_FK
@@ -357,14 +331,14 @@ def list_entries(tagname=None):
                   LIMIT %d OFFSET %d
                   """ % (app.config['MAX_PAGE_ENTRIES'], offset))
 
-        num_entries = query_db(
+        num_entries = data_layer.query_db(
                   """
                   SELECT COUNT(*)
                   FROM ENTRY
                   """,
                   one=True)['COUNT(*)']
     else:
-        entries = query_db(
+        entries = data_layer.query_db(
                   """
                   SELECT entry.id, entry.slug, entry.title, entry.body, 
                   entry.last_date,entry.creation_date FROM entry
@@ -375,7 +349,7 @@ def list_entries(tagname=None):
                   """,
                   [tagname])
 
-        num_entries = query_db(
+        num_entries = data_layer.query_db(
                 """
                 SELECT COUNT(*)
                 FROM entry
@@ -395,7 +369,6 @@ def list_entries(tagname=None):
     # Splitting pages
     splitted_pages = unpack_pages(split_pages(page, entry_pages(num_entries)))
 
-
     # Jinja2 render
     return render_template("list_entries.html", actual_page=page, entries=entries, pages=splitted_pages)
 
@@ -408,7 +381,7 @@ def view_entry(year, month, day, title):
     except:
         abort(400)
 
-    entry = query_db(
+    entry = data_layer.query_db(
             'SELECT * FROM entry \
              WHERE slug = ? \
              AND creation_date = ?',
@@ -427,7 +400,7 @@ def login():
     """Authenticate a user into the application given his credentials."""
     error = None
     if request.method == 'POST':
-        user = query_db(
+        user = data_layer.query_db(
                """
                SELECT * FROM user
                WHERE username = ?
@@ -485,7 +458,7 @@ def add_entry():
                  g.user['id']))
  
                 g.db.commit()
-                lastid = query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
+                lastid = data_layer.query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
                 if request.form['tags'] !='':
                     process_tags(lastid, request.form['tags'].split())
 
@@ -502,7 +475,7 @@ def admin_panel():
     """Display a panel for administration purposes."""
     if g.user is not None:
         if g.user['role_name'] == 'administrator':
-            entries_list = query_db(
+            entries_list = data_layer.query_db(
                            """
                            SELECT id, user_id_FK, slug, title 
                            FROM entry
