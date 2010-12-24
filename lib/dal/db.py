@@ -1,5 +1,23 @@
+# -*- coding: utf-8 -*-
+"""
+
+    lib.dal.db
+    ~~~~~~~~~~~~~~~~~~
+
+    Experimental library to implement a data layer for
+    Proudlygeek's blog app. It currently supports sqlite
+    and, in the near future, Google App Engine's Datastore.
+
+
+    :copyright: (c) 2010 by Gianluca Bargelli.
+    :license: MIT License, see LICENSE for more details.
+
+
+"""
+
 from blog import app
 from flask import g
+from contextlib import closing
 
 if app.config['PLATFORM']=='sqlite':
     try:
@@ -26,7 +44,7 @@ class SQLiteLayer(DataLayer):
         if not testdb:
             schema = 'schema.sql'
         else:
-            schema = '../tests/test_db.sql'
+            schema = 'test_db.sql'
             DATABASE = 'blog.db'
 
         with closing(self.connect_db()) as db:

@@ -4,11 +4,12 @@
     Blog Tests
     ~~~~~~~~~~
 
-
     Tests the blog application.
 
     :copyright: © 2010 by Gianluca Bargelli.
     :license: MIT, see LICENSE for more details.
+
+
 """
 
 import os
@@ -16,21 +17,24 @@ import math
 import unittest
 import tempfile
 import datetime
-from proudlygeek import blog
-
+from blog import app
+from blog import views
+from blog import helpers
+from lib import factory
 
 class BlogTestCase(unittest.TestCase):
 
     def setUp(self):
         """Before each test, set up a sample database"""
-        self.db_fd, blog.app.config['DATABASE'] = tempfile.mkstemp()
-        self.app = blog.app.test_client()
+        self.data_layer = factory('sqlite')
+        self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
+        self.app = app.test_client()
         blog.init_db(testdb=True)
 
     def tearDown(self):
         """Get rid of the database again after each test."""
         os.close(self.db_fd)
-        os.unlink(blog.app.config['DATABASE'])
+        os.unlink(app.config['DATABASE'])
 
     # Helper Functions
     def login(self, username, password):
@@ -178,7 +182,7 @@ class BlogTestCase(unittest.TestCase):
         # Create 27 entries
         self.create_sample_entries(27)
         # Check if page numbers are correct
-        entry_pages_check = int(math.ceil(27/blog.app.config['MAX_PAGE_ENTRIES']*1.0))
+        entry_pages_check = int(math.ceil(27/app.config['MAX_PAGE_ENTRIES']*1.0))
         rv = self.app.get('/')
         print rv.data
         print entry_pages_check
