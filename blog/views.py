@@ -84,7 +84,6 @@ def list_entries(tagname=None):
     if len(entries) == 0 and page !=1: 
         abort(404)
 
-
     # Splitting pages
     splitted_pages = unpack_pages(split_pages(page, entry_pages(num_entries)))
 

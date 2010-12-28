@@ -82,7 +82,7 @@ class SQLiteLayer(DataLayer):
                       SELECT *
                       FROM Entry
                       ORDER BY creation_date DESC, id DESC 
-                      LIMIT ? OFFSET ?
+                      LIMIT ? OFFSET ? 
                       """, 
                       (app.config['MAX_PAGE_ENTRIES'], offset))
 
@@ -151,7 +151,7 @@ class BigtableLayer(DataLayer):
         parsed_query = replace_questionmarks(query, args)
         # Run GQL Query
         rs = db.GqlQuery(parsed_query)
-        return rs
+        return gql_to_list(rs)
     
     def num_entries(self, tagname, offset):
         """Returns the number of entries of a table."""
@@ -160,7 +160,7 @@ class BigtableLayer(DataLayer):
             """
             SELECT *
             FROM Entry
-            ORDER BY creation_date DESC, id DESC
+            ORDER BY creation_date DESC
             LIMIT ? OFFSET ?
             """,
             (app.config['MAX_PAGE_ENTRIES'], offset))
@@ -171,7 +171,7 @@ class BigtableLayer(DataLayer):
             FROM Entry
             """).count()
         
-        return list(entries), num_entries
+        return entries, num_entries
          
         
 def factory(db_name):
@@ -215,3 +215,35 @@ def replace_questionmarks(string, args=()):
     return newstring
 
 
+def gql_to_list(gql_rs):
+    """
+    Returns a list of entries given a gql resultset with the following
+    structure:
+
+    [{<rs1>},{<rs2>},...,{<rsi>},{<rsi+1>},...,{<rsn>}] for 1<=i<=n
+     
+    where the generic dictionary element {<rsi>} is:
+    
+    {'slug':slug_i, 
+     'title':title_i, 
+     'body':body_i, 
+     'creation_date':creation_date_i,
+     'human_date':human_date_i,
+     'last_date':last_date_i,
+     'user_id_FK':user_id_FK,
+     'tags':[<tag1>,<tag2>,...,<tagj>,<tagj+1>,...,<tagm>] for 1<=j<=m
+    }
+    """
+    result_list = list()
+    for item in gql_rs:
+        d = {'slug':item.slug,
+        'title':item.title,
+        'body':item.body,
+        'creation_date':item.creation_date.strftime('%Y-%m-%d'),
+        'human_date':item.creation_date.strftime('%d %b').upper(),
+        'last_date':item.last_date.strftime('%Y-%m-%d'),
+        'user_id_FK':item.user_id_FK,
+        'tags':item.tags}
+        result_list.append(d)
+    
+    return result_list
