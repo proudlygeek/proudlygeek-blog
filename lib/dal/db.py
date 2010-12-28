@@ -131,7 +131,7 @@ class BigtableLayer(DataLayer):
         entry = Entry(key_name="entry_key",
                 slug="hello-world",
                 title="""Hello World!""",
-                body="""<h2>Hello World!</h2>""",
+                body="""Lorem ipsum mania!""",
                 user_id_FK=user,
                 tags=['tag1','tag2','tag3'])
         # Saves result to datastore
@@ -169,6 +169,24 @@ class BigtableLayer(DataLayer):
             """
             SELECT *
             FROM Entry
+            """).count()
+
+        else:
+            entries = self.query_db(
+            """
+            SELECT *
+            FROM Entry
+            WHERE tags = '?'
+            ORDER BY creation_date DESC
+            LIMIT ? OFFSET ?
+            """,
+            (tagname, app.config['MAX_PAGE_ENTRIES'], offset ))
+            
+            num_entries = db.GqlQuery(
+            """
+            SELECT *
+            FROM Entry
+            WHERE tags = '?'
             """).count()
         
         return entries, num_entries
