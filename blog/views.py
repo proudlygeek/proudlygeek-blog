@@ -52,7 +52,7 @@ def before_request():
 @app.after_request
 def after_request(response):
     """Closes the database again at the end of the request."""
-    g.db.close()
+    data_layer.close()
     return response
 
 
@@ -76,52 +76,15 @@ def list_entries(tagname=None):
 
     # Calculate the right offset
     offset = app.config['MAX_PAGE_ENTRIES']*(page-1)
-
-    if not tagname:
-        entries = data_layer.query_db(
-                  """
-                  SELECT id, slug, title, body, last_date, 
-                         creation_date, user_id_FK
-                  FROM entry
-                  ORDER BY creation_date DESC, id DESC 
-                  LIMIT %d OFFSET %d
-                  """ % (app.config['MAX_PAGE_ENTRIES'], offset))
-
-        num_entries = data_layer.query_db(
-                  """
-                  SELECT COUNT(*)
-                  FROM ENTRY
-                  """,
-                  one=True)['COUNT(*)']
-    else:
-        entries = data_layer.query_db(
-                  """
-                  SELECT entry.id, entry.slug, entry.title, entry.body, 
-                  entry.last_date,entry.creation_date FROM entry
-                  JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
-                  JOIN tag ON entry_tags.id_tag_FK = tag.id
-                  WHERE tag.name = ?
-                  ORDER BY entry.creation_date DESC, entry.id DESC
-                  """,
-                  [tagname])
-
-        num_entries = data_layer.query_db(
-                """
-                SELECT COUNT(*)
-                FROM entry
-                JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
-                JOIN tag on entry_tags.id_tag_FK = tag.id
-                WHERE tag.name = ?
-                """,
-                [tagname], one=True)['COUNT(*)']
-
+    
+    # Obtain entries and num_entries
+    entries, num_entries = data_layer.num_entries(tagname, offset)
 
     # This happens when trying to access a non-existent page
     if len(entries) == 0 and page !=1: 
         abort(404)
 
-    # Filling entries
-    fill_entries(entries)
+
     # Splitting pages
     splitted_pages = unpack_pages(split_pages(page, entry_pages(num_entries)))
 
@@ -138,11 +101,12 @@ def view_entry(year, month, day, title):
         abort(400)
 
     entry = data_layer.query_db(
-            'SELECT * FROM entry \
-             WHERE slug = ? \
-             AND creation_date = ?',
-             [title, entrydate],
-             one=True)
+    """
+    SELECT * FROM Entry
+    WHERE slug = ?
+    AND creation_date = ?
+    """,
+    [title, entrydate], one=True)
 
     if entry is None:
         abort(404)

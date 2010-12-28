@@ -19,9 +19,20 @@ from blog import app
 from flask import g
 from contextlib import closing
 
+
 if app.config['PLATFORM']=='sqlite':
     try:
         import sqlite3
+        from blog.helpers import fill_entries
+    except NameError as e:
+        print e
+
+if app.config['PLATFORM']=='gae':
+    try:
+        from google.appengine.ext import db
+        from blog.models import Rank, User, Entry
+
+
     except NameError as e:
         print e
 
@@ -51,6 +62,10 @@ class SQLiteLayer(DataLayer):
             with app.open_resource(schema) as f:
                 db.cursor().executescript(f.read())
             db.commit()
+    
+    def close(self):
+        """Closes the database connection at the end of the request."""
+        g.db.close()
 
     def query_db(self, query, args=(), one=False):
         """Queries the database and returns a list of dictionaries."""
@@ -58,12 +73,145 @@ class SQLiteLayer(DataLayer):
         rv = [dict((cur.description[idx][0], value)
         for idx, value in enumerate(row)) for row in cur.fetchall()]
         return (rv[0] if rv else None) if one else rv
+    
+    def num_entries(self, tagname, offset):
+        """Returns the number of entries of a table."""
+        if not tagname:
+            entries = self.query_db(
+                      """
+                      SELECT *
+                      FROM Entry
+                      ORDER BY creation_date DESC, id DESC 
+                      LIMIT ? OFFSET ?
+                      """, 
+                      (app.config['MAX_PAGE_ENTRIES'], offset))
 
+            num_entries = self.query_db(
+                          """
+                          SELECT COUNT(*)
+                          FROM Entry
+                          """,
+                          one=True)['COUNT(*)']
+
+        else:
+            entries = self.query_db(
+                      """
+                      SELECT entry.id, entry.slug, entry.title, entry.body, 
+                      entry.last_date,entry.creation_date FROM entry
+                      JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
+                      JOIN tag ON entry_tags.id_tag_FK = tag.id
+                      WHERE tag.name = ?
+                      ORDER BY entry.creation_date DESC, entry.id DESC
+                      """,
+                      [tagname])
+
+            num_entries = self.query_db(
+                    """
+                    SELECT COUNT(*)
+                    FROM entry
+                    JOIN entry_tags ON entry.id = entry_tags.id_entry_FK
+                    JOIN tag on entry_tags.id_tag_FK = tag.id
+                    WHERE tag.name = ?
+                    """,
+                    [tagname], one=True)['COUNT(*)']
+        
+        # Filling entries (Join tables for sqlite)
+        fill_entries(entries)
+        # Return the entries 
+        return entries, num_entries
+        
 
 class BigtableLayer(DataLayer):
     def __init__(self):
-        pass
+        # Create sample user
+        rank = Rank(role_name="admin",key_name="role_key")
+        user = User(username="bargio",key_name="bargio_key",
+               password = "13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
+               rank_id_fk = rank)
+        entry = Entry(key_name="entry_key",
+                slug="hello-world",
+                title="""Hello World!""",
+                body="""<h2>Hello World!</h2>""",
+                user_id_FK=user,
+                tags=['tag1','tag2','tag3'])
+        # Saves result to datastore
+        db.put([rank, user, entry])
 
+    def connect_db(self):
+        pass
+    
+    def close(self):
+        pass
+    
+    def query_db(self, query, args=(), one=False):
+        """
+        Queries the Datastore by using GQL syntax.
+        """
+        # Parse question marks
+        parsed_query = replace_questionmarks(query, args)
+        # Run GQL Query
+        rs = db.GqlQuery(parsed_query)
+        return rs
+    
+    def num_entries(self, tagname, offset):
+        """Returns the number of entries of a table."""
+        if not tagname:
+            entries = self.query_db(
+            """
+            SELECT *
+            FROM Entry
+            ORDER BY creation_date DESC, id DESC
+            LIMIT ? OFFSET ?
+            """,
+            (app.config['MAX_PAGE_ENTRIES'], offset))
+            
+            num_entries = db.GqlQuery(
+            """
+            SELECT *
+            FROM Entry
+            """).count()
+        
+        return list(entries), num_entries
+         
+        
 def factory(db_name):
+    """
+    Returns the appropriate data layer class by using the db_name
+    parameter as a dictionary key; Right now, it contains entries for
+    sqlite and gae.
+    """
     supported_db={'sqlite': SQLiteLayer, 'gae':BigtableLayer}
     return supported_db[db_name]()
+
+
+def replace_questionmarks(string, args=()):
+    """
+    Replaces all question marks in a string with the sequential argument
+    contained into args().
+
+    For example, the query;
+
+    SELECT * FROM User
+    WHERE User.name = ? AND
+    User.pass = ?
+
+    with args = ('Tom','test')
+    
+    become
+
+    SELECT * from User
+    WHERE User.name = 'Tom' AND
+    User.pass = 'test'
+
+    This is useful for traslating SQL SELECT statements into GQL Queries.
+    """
+    # Convert tuple to list and reverts it (for argument pop)
+    args = list(args)[::-1]
+    newstring = ""
+    for char in string:
+        if char == '?':
+            char = str(args.pop())
+        newstring+=char
+    return newstring
+
+
