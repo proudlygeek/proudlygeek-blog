@@ -14,12 +14,6 @@
 """
 
 from google.appengine.ext import db
-class Rank(db.Model):
-    """
-    This class models a rank into a
-    Google App Engine's Datastore entity.
-    """
-    role_name = db.StringProperty(required=True)
 
 
 class User(db.Model):
@@ -29,7 +23,9 @@ class User(db.Model):
     """
     username = db.StringProperty(required=True)
     password = db.StringProperty(required=True, indexed=False)
-    rank_id_fk = db.ReferenceProperty(Rank, 'User')
+    rank = db.StringProperty(required=True, 
+            choices = ['user','admin'],
+            default = 'user')
 
 
 class Entry(db.Model):

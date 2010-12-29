@@ -30,8 +30,7 @@ if app.config['PLATFORM']=='sqlite':
 if app.config['PLATFORM']=='gae':
     try:
         from google.appengine.ext import db
-        from blog.models import Rank, User, Entry
-
+        from blog.models import User, Entry
 
     except NameError as e:
         print e
@@ -119,15 +118,39 @@ class SQLiteLayer(DataLayer):
         fill_entries(entries)
         # Return the entries 
         return entries, num_entries
-        
+
+    def get_user(self, username):
+        """Return the user model if the given username exists."""
+        user = self.query_db(
+               """
+               SELECT * FROM User
+               WHERE username = '?'
+               """, 
+               [username],
+               one=True)
+
+        return user
+
+    def load_user_profile(self, id):
+        """Load a user's profile given his unique id."""
+        user_profile = data_layer.query_db(
+                 """
+                 SELECT user.id, rank.role_name
+                 FROM user, rank 
+                 WHERE user.rank_id_FK = rank.id
+                 AND user.id = ?
+                 """, 
+                 [id], 
+                 one=True)
+
+        return user_profile
 
 class BigtableLayer(DataLayer):
     def __init__(self):
         # Create sample user
-        rank = Rank(role_name="admin",key_name="role_key")
         user = User(username="bargio",key_name="bargio_key",
-               password = "13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
-               rank_id_fk = rank)
+               password="f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
+               rank='admin')
         entry = Entry(key_name="entry_key",
                 slug="hello-world",
                 title="""Hello World!""",
@@ -135,7 +158,7 @@ class BigtableLayer(DataLayer):
                 user_id_FK=user,
                 tags=['tag1','tag2','tag3'])
         # Saves result to datastore
-        db.put([rank, user, entry])
+        db.put([user, entry])
 
     def connect_db(self):
         pass
@@ -151,7 +174,7 @@ class BigtableLayer(DataLayer):
         parsed_query = replace_questionmarks(query, args)
         # Run GQL Query
         rs = db.GqlQuery(parsed_query)
-        return gql_to_list(rs)
+        return rs
     
     def num_entries(self, tagname, offset):
         """Returns the number of entries of a table."""
@@ -189,8 +212,26 @@ class BigtableLayer(DataLayer):
             WHERE tags = '?'
             """).count()
         
-        return entries, num_entries
-         
+        return gqlentries_to_list(entries), num_entries
+
+    def get_user(self, username):
+        """Return the user model if the given username exists."""
+        user = db.GqlQuery(
+        """
+        SELECT * 
+        FROM User
+        WHERE username = :1
+        """, username).get()
+
+        return gqluser_to_dict(user)
+
+    def load_user_profile(self, id_or_name):
+        """Load a user's profile given his unique id."""
+        profile_key = db.Key.from_path('User', str(id_or_name))
+        user_profile = db.get(profile_key)
+
+        return user_profile
+ 
         
 def factory(db_name):
     """
@@ -233,7 +274,7 @@ def replace_questionmarks(string, args=()):
     return newstring
 
 
-def gql_to_list(gql_rs):
+def gqlentries_to_list(gql_rs):
     """
     Returns a list of entries given a gql resultset with the following
     structure:
@@ -265,3 +306,23 @@ def gql_to_list(gql_rs):
         result_list.append(d)
     
     return result_list
+
+
+def gqluser_to_dict(gql_user):
+    """
+    Converts a single user gql resultset using the following dict structure:
+
+    {'username':username, 
+     'password':hashed_password, 
+     'rank':user_rank
+    }
+    """
+    if not gql_user:
+        return None
+
+    d = {'id':gql_user.key().id_or_name(),
+         'username':gql_user.username,
+         'password':gql_user.password,
+         'rank':gql_user.rank}
+
+    return d

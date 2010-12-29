@@ -38,15 +38,7 @@ def before_request():
     g.user = None 
     
     if 'user_id' in session:
-        g.user = data_layer.query_db(
-                 """
-                 SELECT user.id, rank.role_name
-                 FROM user, rank 
-                 WHERE user.rank_id_FK = rank.id
-                 AND user.id = ?
-                 """, 
-                 [session['user_id']], 
-                 one=True)
+        g.user = data_layer.load_user_profile(session['user_id'])
 
 
 @app.after_request
@@ -119,13 +111,7 @@ def login():
     """Authenticate a user into the application given his credentials."""
     error = None
     if request.method == 'POST':
-        user = data_layer.query_db(
-               """
-               SELECT * FROM user
-               WHERE username = ?
-               """, 
-               [request.form['username']],
-               one=True)
+        user = data_layer.get_user(request.form['username'])
 
         if user is None:
             error = 'Invalid username'
