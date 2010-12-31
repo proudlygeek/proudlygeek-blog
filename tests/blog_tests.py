@@ -26,7 +26,6 @@ class BlogTestCase(unittest.TestCase):
 
     def setUp(self):
         """Before each test, set up a sample database"""
-        self.data_layer = factory('sqlite')
         self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
         self.app = app.test_client()
         blog.init_db(testdb=True)

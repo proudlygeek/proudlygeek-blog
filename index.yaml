@@ -12,6 +12,13 @@ indexes:
 
 - kind: Entry
   properties:
+  - name: creation_date
+  - name: __key__
+    direction: desc
+
+- kind: Entry
+  properties:
   - name: tags
   - name: creation_date
+  - name: __key__
     direction: desc

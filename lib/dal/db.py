@@ -16,13 +16,15 @@
 """
 
 from blog import app
-from flask import g
+from flask import g, Markup
 from contextlib import closing
+from blog.helpers import slugify_entry
 
 
 if app.config['PLATFORM']=='sqlite':
     try:
         import sqlite3
+        import datetime
         from blog.helpers import fill_entries
     except NameError as e:
         print e
@@ -31,6 +33,8 @@ if app.config['PLATFORM']=='gae':
     try:
         from google.appengine.ext import db
         from blog.models import User, Entry
+        from blog.helpers import fill_markdown_content, \
+             generate_readmore
 
     except NameError as e:
         print e
@@ -73,8 +77,16 @@ class SQLiteLayer(DataLayer):
         for idx, value in enumerate(row)) for row in cur.fetchall()]
         return (rv[0] if rv else None) if one else rv
     
-    def num_entries(self, tagname, offset):
-        """Returns the number of entries of a table."""
+    def get_entries(self, tagname, offset):
+        """
+        Retrieves entries from the database. 
+        It returns a tuple following the scheme:
+
+        (entries_list, #entries)
+
+        Where entries_list is a list of entries for the given tagname
+        (which can be None) and #entries is their total number.
+        """
         if not tagname:
             entries = self.query_db(
                       """
@@ -119,21 +131,42 @@ class SQLiteLayer(DataLayer):
         # Return the entries 
         return entries, num_entries
 
+    def get_entry(self, title, entry_date):
+        """
+        Retrieves a specific entry by specifing a creation date
+        and a title; this method is expecting to 
+        fetch one or none entries from the database.
+        """
+        entry = self.query_db(
+        """
+        SELECT * FROM Entry
+        WHERE slug = ?
+        AND creation_date = ?
+        """,
+        [title, entry_date], one=True)
+
+        if entry:
+            fill_entries([entry])
+            return entry
+        
+
     def get_user(self, username):
         """Return the user model if the given username exists."""
-        user = self.query_db(
-               """
-               SELECT * FROM User
-               WHERE username = '?'
-               """, 
-               [username],
-               one=True)
+        if username:
+            user = self.query_db(
+                   """
+                   SELECT * FROM User
+                   WHERE username = ?
+                   """, 
+                   [username], one=True)
+        else:
+            user = None
 
         return user
 
     def load_user_profile(self, id):
         """Load a user's profile given his unique id."""
-        user_profile = data_layer.query_db(
+        user_profile = self.query_db(
                  """
                  SELECT user.id, rank.role_name
                  FROM user, rank 
@@ -145,20 +178,64 @@ class SQLiteLayer(DataLayer):
 
         return user_profile
 
+    def insert_entry(self, title, text, owner, tags):
+        """Inserts a new entry post into the database."""
+        today = datetime.date.today()
+        creation_date = today.strftime('%Y-%m-%d')
+        last_date = creation_date
+
+        g.db.execute(
+        """
+        INSERT INTO entry
+        VALUES (null, ?, ?, ?, ?, ?, ?)
+        """,
+        (slugify_entry(title),
+         title,
+         text,
+         creation_date,
+         last_date,
+         g.user['id']))
+
+        g.db.commit()
+        lastid = self.query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
+        if tags !='':
+           self.process_tags(lastid, tags.split())
+
+    def process_tags(self, entry_id, tags_list):
+        """
+        For each tag into tags_list it retrieves it's id from the database;
+        if a supplied tag is not recorded then it creates a new database record.
+        """
+        for tag in tags_list:
+            current=self.query_db('SELECT id FROM tag \
+                              WHERE tag.name = ?',
+                              [tag],
+                              one=True)
+
+            if current is None:
+                g.db.execute('INSERT INTO tag \
+                              VALUES (null, ?)',
+                              [tag])
+
+                current = self.query_db('SELECT last_insert_rowid()', 
+                                    one=True)['last_insert_rowid()']
+            else:
+                current = current['id']
+
+            g.db.execute('INSERT INTO entry_tags \
+                          VALUES (?, ?)',
+                          (entry_id, current))
+        g.db.commit()
+
+
 class BigtableLayer(DataLayer):
     def __init__(self):
-        # Create sample user
-        user = User(username="bargio",key_name="bargio_key",
+        # Create sample user admin:ciao
+        user = User(username="admin",key_name="admin_key",
                password="f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
                rank='admin')
-        entry = Entry(key_name="entry_key",
-                slug="hello-world",
-                title="""Hello World!""",
-                body="""Lorem ipsum mania!""",
-                user_id_FK=user,
-                tags=['tag1','tag2','tag3'])
         # Saves result to datastore
-        db.put([user, entry])
+        db.put([user])
 
     def connect_db(self):
         pass
@@ -176,14 +253,22 @@ class BigtableLayer(DataLayer):
         rs = db.GqlQuery(parsed_query)
         return rs
     
-    def num_entries(self, tagname, offset):
-        """Returns the number of entries of a table."""
+    def get_entries(self, tagname, offset):
+        """
+        Retrieves entries from the datastore. 
+        It returns a tuple following the scheme:
+
+        (entries_list, #entries)
+
+        Where entries_list is a list of entries for the given tagname
+        (which can be None) and #entries is their total number.
+        """
         if not tagname:
             entries = self.query_db(
             """
             SELECT *
             FROM Entry
-            ORDER BY creation_date DESC
+            ORDER BY creation_date, __key__ DESC
             LIMIT ? OFFSET ?
             """,
             (app.config['MAX_PAGE_ENTRIES'], offset))
@@ -200,7 +285,7 @@ class BigtableLayer(DataLayer):
             SELECT *
             FROM Entry
             WHERE tags = '?'
-            ORDER BY creation_date DESC
+            ORDER BY creation_date, __key__ DESC
             LIMIT ? OFFSET ?
             """,
             (tagname, app.config['MAX_PAGE_ENTRIES'], offset ))
@@ -212,7 +297,29 @@ class BigtableLayer(DataLayer):
             WHERE tags = '?'
             """).count()
         
-        return gqlentries_to_list(entries), num_entries
+        # Parse Markdown Text
+        list_entries = gqlentries_to_list(entries)
+        fill_markdown_content(list_entries)
+        
+        return list_entries, num_entries
+
+    def get_entry(self, title, entry_date):
+        """
+        Retrieves a specific entry by specifing a creation date
+        and a title; this method is expecting to 
+        fetch one or none entries from the database.
+        """
+        entry = db.GqlQuery(
+        """
+        SELECT * FROM Entry
+        WHERE slug =:1
+        AND creation_date =:2
+        """, title, entry_date).get()
+
+        list_entry = gqlentries_to_list([entry])
+        fill_markdown_content(list_entry)
+
+        return list_entry[0]
 
     def get_user(self, username):
         """Return the user model if the given username exists."""
@@ -230,7 +337,25 @@ class BigtableLayer(DataLayer):
         profile_key = db.Key.from_path('User', str(id_or_name))
         user_profile = db.get(profile_key)
 
-        return user_profile
+        return gqluser_to_dict(user_profile)
+
+    def insert_entry(self, title, text, owner, tags):
+        """Inserts a new entry post into the datastore."""
+        # Retrieves Owner's key
+        owner_key = db.Key.from_path('User', owner)
+        # Create a new entity (without tags)
+        new_entry = Entry(
+                    slug=slugify_entry(title),
+                    title=title,
+                    body=text,
+                    user_id_FK=owner_key)
+
+        # Insert tags into entry's list
+        for tag in list(tags.split()):
+            new_entry.tags.append(tag)
+
+        # Store Entity
+        db.put(new_entry)
  
         
 def factory(db_name):
@@ -312,7 +437,8 @@ def gqluser_to_dict(gql_user):
     """
     Converts a single user gql resultset using the following dict structure:
 
-    {'username':username, 
+    {'id':id_or_keyname,
+     'username':username, 
      'password':hashed_password, 
      'rank':user_rank
     }

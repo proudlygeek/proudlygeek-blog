@@ -37,6 +37,6 @@ class Entry(db.Model):
     title = db.StringProperty(required=True)
     body = db.TextProperty(required=True)
     creation_date = db.DateProperty(auto_now_add=True)
-    last_date = db.DateProperty(auto_now=True)
+    last_date = db.DateTimeProperty(auto_now=True)
     user_id_FK = db.ReferenceProperty(User, collection_name='Owner')
     tags = db.StringListProperty()

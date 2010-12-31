@@ -50,33 +50,6 @@ def slugify_entry(entry_title, delim=u'-'):
     return unicode(delim.join(result))
 
 
-def process_tags(entry_id, tags_list):
-    """
-    For each tag into tags_list it retrieves it's id from the database;
-    if a supplied tag is not recorded then it creates a new database record.
-    """
-    for tag in tags_list:
-        current=data_layer.query_db('SELECT id FROM tag \
-                          WHERE tag.name = ?',
-                          [tag],
-                          one=True)
-
-        if current is None:
-            g.db.execute('INSERT INTO tag \
-                          VALUES (null, ?)',
-                          [tag])
-
-            current = data_layer.query_db('SELECT last_insert_rowid()', 
-                                one=True)['last_insert_rowid()']
-        else:
-            current = current['id']
-
-        g.db.execute('INSERT INTO entry_tags \
-                      VALUES (?, ?)',
-                      (entry_id, current))
-    g.db.commit()
-
-
 def fill_tags(entries):
     """
     Convenience function which retrieves all the tags and 
@@ -124,7 +97,15 @@ def generate_readmore(entry, single=False):
     Replaces any <hr /> tag with an URL to the full entry's text
     and strips down the current entry's text to make a summary.
     """
-    year, month, day = entry['creation_date'].split('-')
+    try:
+        #SQLite
+        year, month, day = entry['creation_date'].split('-')
+    except:
+        #GAE
+        year = str(entry['creation_date'].year)
+        month = str(entry['creation_date'].month)
+        day = str(entry['creation_date'].day)
+
     entry_url = """<a class="readmore" href="%s"> Read more about "%s"...</a>""" \
                  % (url_for('view_entry', year=year, month=month, day=day, 
                  title=entry['slug']), entry['title'])
@@ -153,6 +134,7 @@ def fill_markdown_content(entries):
         single = False
 
     for entry in entries:
+        pass
         entry['content'] = Markup(markdown.markdown(entry['body']))
         generate_readmore(entry, single)
 

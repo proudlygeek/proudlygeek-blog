@@ -70,7 +70,7 @@ def list_entries(tagname=None):
     offset = app.config['MAX_PAGE_ENTRIES']*(page-1)
     
     # Obtain entries and num_entries
-    entries, num_entries = data_layer.num_entries(tagname, offset)
+    entries, num_entries = data_layer.get_entries(tagname, offset)
 
     # This happens when trying to access a non-existent page
     if len(entries) == 0 and page !=1: 
@@ -87,22 +87,15 @@ def list_entries(tagname=None):
 def view_entry(year, month, day, title):
     """Retrieves an article by date and title."""
     try:
-        entrydate = datetime.date(year, month, day)
+        entry_date = datetime.date(year, month, day)
     except:
         abort(400)
 
-    entry = data_layer.query_db(
-    """
-    SELECT * FROM Entry
-    WHERE slug = ?
-    AND creation_date = ?
-    """,
-    [title, entrydate], one=True)
+    entry = data_layer.get_entry(title=title, entry_date=entry_date)
 
     if entry is None:
         abort(404)
     else:
-        fill_entries([entry])
         return render_template('list_entries.html', entries=[entry])
 
 
@@ -151,21 +144,12 @@ def add_entry():
                 errors.append('Message body is empty')
 
             if (errors == []):
-                today = datetime.date.today()
-                g.db.execute(
-                'INSERT INTO entry \
-                 VALUES (null, ?, ?, ?, ?, null, ?)',
-                (
-                 slugify_entry(request.form['title']),
-                 request.form['title'],
-                 request.form['entry_text'],
-                 today.strftime('%Y-%m-%d'),
-                 g.user['id']))
- 
-                g.db.commit()
-                lastid = data_layer.query_db('SELECT last_insert_rowid()',one=True)['last_insert_rowid()']
-                if request.form['tags'] !='':
-                    process_tags(lastid, request.form['tags'].split())
+
+                data_layer.insert_entry(
+                     title=request.form['title'],
+                     text=request.form['entry_text'],
+                     owner=g.user['id'],
+                     tags=request.form['tags'])
 
                 flash('Entry added.')
                 return redirect(url_for('list_entries'))
