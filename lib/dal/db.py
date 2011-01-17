@@ -58,7 +58,7 @@ class SQLiteLayer(DataLayer):
         if not testdb:
             schema = 'schema.sql'
         else:
-            schema = 'test_db.sql'
+            schema = 'fixture-sqlite.sql'
             DATABASE = 'blog.db'
 
         with closing(self.connect_db()) as db:

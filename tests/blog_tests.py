@@ -12,23 +12,25 @@
 
 """
 
+from flask import Flask
 import os
 import math
 import unittest
 import tempfile
 import datetime
-from blog import app
+from blog import app, data_layer
 from blog import views
 from blog import helpers
-from lib import factory
+
 
 class BlogTestCase(unittest.TestCase):
+    
 
     def setUp(self):
         """Before each test, set up a sample database"""
         self.db_fd, app.config['DATABASE'] = tempfile.mkstemp()
         self.app = app.test_client()
-        blog.init_db(testdb=True)
+        data_layer.init_db(testdb=True)
 
     def tearDown(self):
         """Get rid of the database again after each test."""
@@ -119,7 +121,7 @@ class BlogTestCase(unittest.TestCase):
     def test_slugify_entry(self):
         """Test if slugify_entry generates a correct slug."""
         # Basic check
-        rv = blog.slugify_entry(u"""!!"£$%&/()=?^'[]@#`<>'"%ciao mondo!""")
+        rv = helpers.slugify_entry(u"""!!"£$%&/()=?^'[]@#`<>'"%ciao mondo!""")
         assert u'ciao-mondo' == rv
 
     def test_add_entry_with_tags(self):
