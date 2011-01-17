@@ -11,6 +11,15 @@
 <div class = "add-form">
   <form action ="{{url_for('add_entry')}}" method = "POST">
     <p><label>Title: <input type = "text", name = "title"></label></p>
+    <p>
+      <label>Image URL: <input type = "url", name = "img_url"> </label>
+      <label>Alignment: 
+        <select name = "img_align">
+          <option value = "left"> Left </option>
+          <option value = "right"> Center </option>
+        </select>
+      </label>
+    </p>
     <p><label><p>Enter your message:</p> <textarea cols = 65 rows = 10 name = "entry_text"></textarea></p>
     <p><label><p>Tags:</p><input type = "text" name = "tags" >
     <p><input type = "submit" value = "Submit"></p>

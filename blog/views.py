@@ -138,10 +138,15 @@ def add_entry():
                 errors.append('Message body is empty')
 
             if (errors == []):
+                entry_text = request.form['entry_text']
+
+                if request.form['img_url']:
+                    img_string = """<img src = "%s" class = "%s"/>""" % (request.form['img_url'], request.form['img_align'])
+                    entry_text = img_string + entry_text
 
                 data_layer.insert_entry(
                      title=request.form['title'],
-                     text=request.form['entry_text'],
+                     text=entry_text,
                      owner=g.user['id'],
                      tags=request.form['tags'])
 
