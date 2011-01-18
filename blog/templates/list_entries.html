@@ -18,6 +18,7 @@
     <div id = "entry_body">
       <div class = "date">
         <p>{{ entry.human_date }}</p>
+        <div id = "author">Posted by {{entry.author}}</div>
       </div>
       <div id = "text">
         <p>{{ entry.content|safe }}</p>

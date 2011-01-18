@@ -26,7 +26,7 @@ if app.config['PLATFORM']=='sqlite':
         import sqlite3
         import datetime
         from blog.helpers import fill_entries
-    except:
+    except ImportError:
         print "Database Wrapper error (sqlite)."
 
 if app.config['PLATFORM']=='gae':
@@ -36,7 +36,7 @@ if app.config['PLATFORM']=='gae':
         from blog.helpers import fill_markdown_content, \
              generate_readmore
 
-    except:
+    except ImportError:
         print "Database Wrapper error (GAE)."
 
 
@@ -409,7 +409,8 @@ def gqlentries_to_list(gql_rs):
      
     where the generic dictionary element {<rsi>} is:
     
-    {'slug':slug_i, 
+    {'slug':slug_i,
+     'author':user_id_FK_i.username,
      'title':title_i, 
      'body':body_i, 
      'creation_date':creation_date_i,
@@ -422,6 +423,7 @@ def gqlentries_to_list(gql_rs):
     result_list = list()
     for item in gql_rs:
         d = {'slug':item.slug,
+        'author':item.user_id_FK.username,
         'title':item.title,
         'body':item.body,
         'creation_date':item.creation_date.strftime('%Y-%m-%d'),

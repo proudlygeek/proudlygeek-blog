@@ -101,6 +101,12 @@ pre
 
 }
 
+#entries .date #author
+{
+  font-size:40%;
+  font-weight:normal;
+}
+
 #entry_body
 {
   margin-top:10px;

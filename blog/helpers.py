@@ -161,7 +161,7 @@ def fill_entries(entries):
     # Add Markdown entry
     fill_markdown_content(entries)
     # Add author
-    #fill_author(entries)
+    fill_author(entries)
 
 
 def entry_pages(num_entries):
