@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 
-    lib.dal.db
+    blog.db
     ~~~~~~~~~~~~~~~~~~
 
     Experimental library to implement a data layer for
     Proudlygeek's blog app. It currently supports sqlite
-    and, in the near future, Google App Engine's Datastore.
+    and Google App Engine's Datastore.
 
 
     :copyright: (c) 2010 by Gianluca Bargelli.
@@ -15,7 +15,7 @@
 
 """
 
-from blog import app
+from views import app
 from flask import g, Markup
 from contextlib import closing
 from blog.helpers import slugify_entry
@@ -26,8 +26,8 @@ if app.config['PLATFORM']=='sqlite':
         import sqlite3
         import datetime
         from blog.helpers import fill_entries
-    except NameError as e:
-        print e
+    except:
+        print "Database Wrapper error (sqlite)."
 
 if app.config['PLATFORM']=='gae':
     try:
@@ -36,8 +36,8 @@ if app.config['PLATFORM']=='gae':
         from blog.helpers import fill_markdown_content, \
              generate_readmore
 
-    except NameError as e:
-        print e
+    except:
+        print "Database Wrapper error (GAE)."
 
 
 class DataLayer(object):
@@ -55,16 +55,17 @@ class SQLiteLayer(DataLayer):
 
     def init_db(self, testdb=False):
         """Creates the database tables."""
-        if not testdb:
-            schema = 'schema.sql'
-        else:
-            schema = 'fixture-sqlite.sql'
-            DATABASE = 'blog.db'
-
-        with closing(self.connect_db()) as db:
-            with app.open_resource(schema) as f:
-                db.cursor().executescript(f.read())
-            db.commit()
+#        if not testdb:
+#            schema = 'schema.sql'
+#        else:
+#            schema = 'fixture-sqlite.sql'
+#            DATABASE = 'blog.db'
+#
+#        with closing(self.connect_db()) as db:
+#            with app.open_resource(schema) as f:
+#                db.cursor().executescript(f.read())
+#            db.commit()
+        pass
     
     def close(self):
         """Closes the database connection at the end of the request."""

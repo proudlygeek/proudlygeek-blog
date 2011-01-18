@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from blog import app
-
+from blog.views import app
 
 def main():
     if app.config['PLATFORM']=='sqlite':

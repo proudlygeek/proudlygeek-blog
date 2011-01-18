@@ -13,7 +13,7 @@
 
 """
 
-from blog import app
+from views import app
 from flask import g, Markup, url_for 
 import math
 import hashlib
@@ -180,8 +180,8 @@ def entry_pages(num_entries):
 
     try:
         entry_pages = int(math.ceil(num_entries/max_page_entries))
-    except ZeroDivisionError as Err:
-        print "Critical Error (Is MAX_PAGE_ENTRIES zero?): %s" % (Err)
+    except ZeroDivisionError:
+        print "Critical Error (Is MAX_PAGE_ENTRIES zero?): %s"
 
     # If the result is zero then set default to one page
     if entry_pages == 0:

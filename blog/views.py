@@ -13,13 +13,20 @@
 
 """
 
-from blog import app, data_layer
 from flask import Flask, request, session, g, redirect, \
      render_template, abort, flash, url_for
+
+app = Flask(__name__)
+app.config.from_pyfile('../config.cfg')
+# Loading the Data Abstract Layer object
+from db import factory
+data_layer = factory(app.config['PLATFORM'])
+
 from helpers import check_password_hash, slugify_entry, \
      fill_entries, entry_pages, unpack_pages, split_pages, \
      fill_author, fill_tags
 import datetime
+import config
 
 
 @app.before_request
