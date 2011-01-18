@@ -232,7 +232,7 @@ class SQLiteLayer(DataLayer):
 class BigtableLayer(DataLayer):
     def __init__(self):
         # Create sample user admin:ciao
-        user = User(username="admin",key_name="admin_key",
+        user = User(username="Proudlygeek",key_name="admin_key",
                password="f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
                rank='admin')
         # Saves result to datastore
