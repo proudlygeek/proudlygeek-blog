@@ -269,7 +269,7 @@ class BigtableLayer(DataLayer):
             """
             SELECT *
             FROM Entry
-            ORDER BY creation_date, __key__ DESC
+            ORDER BY creation_date DESC, __key__ DESC
             LIMIT ? OFFSET ?
             """,
             (app.config['MAX_PAGE_ENTRIES'], offset))

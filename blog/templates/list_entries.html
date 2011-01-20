@@ -16,9 +16,14 @@
 
     </ul>
     <div id = "entry_body">
-      <div class = "date">
-        <p>{{ entry.human_date }}</p>
-        <div id = "author">Posted by {{entry.author}}</div>
+      <div id = "date_comments">
+        <div class = "date">
+          <p>{{ entry.human_date }}</p>
+          <div id = "author">Posted by {{entry.author}}</div>
+        </div>
+        <div class= "comments_count">
+          <a href = "{{url_for('view_entry', year = year, month = month, day = day, title = entry.slug)}}#disqus_thread" data-disqus-identifier="{{entry.slug}}"></a>
+        </div>
       </div>
       <div id = "text">
         <p>{{ entry.content|safe }}</p>
@@ -69,4 +74,15 @@
   {% endif %}
   {% endif %}
 </div>
+<script type="text/javascript">
+    var disqus_shortname = 'proudlygeek-blog';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
 {% endblock %}

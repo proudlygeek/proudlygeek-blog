@@ -13,6 +13,7 @@ indexes:
 - kind: Entry
   properties:
   - name: creation_date
+    direction: desc
   - name: __key__
     direction: desc
 
