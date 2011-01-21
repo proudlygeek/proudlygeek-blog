@@ -6,7 +6,6 @@ api_version: 1
 handlers:
 - url: /.*
   script: main.py
-  login: admin
 
 - url: /static
   static_dir: static

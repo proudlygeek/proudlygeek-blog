@@ -2,6 +2,77 @@
 Custom CSS
 */
 
+@font-face {
+    font-family: 'ChunkFiveRegular';
+    src: url('fonts/Chunkfive-webfont.eot');
+    src: local('☺'), url('fonts/Chunkfive-webfont.woff') format('woff'), url('fonts/Chunkfive-webfont.ttf') format('truetype'), url('fonts/Chunkfive-webfont.svg#webfont90E2uSjN') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* A font by Jos Buivenga (exljbris) -> www.exljbris.nl */
+
+@font-face {
+    font-family: 'FontinSansItalic';
+    src: url('fonts/fontin_sans_i_45b-webfont.eot');
+    src: local('☺'), url('fonts/fontin_sans_i_45b-webfont.woff') format('woff'), url('fonts/fontin_sans_i_45b-webfont.ttf') format('truetype'), url('fonts/fontin_sans_i_45b-webfont.svg#webfont5ZhrQS12') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FontinSansBold';
+    src: url('fonts/fontin_sans_b_45b-webfont.eot');
+    src: local('☺'), url('fonts/fontin_sans_b_45b-webfont.woff') format('woff'), url('fonts/fontin_sans_b_45b-webfont.ttf') format('truetype'), url('fonts/fontin_sans_b_45b-webfont.svg#webfontHj0xk2xk') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'FontinSansRegular';
+    src: url('fonts/fontin_sans_r_45b-webfont.eot');
+    src: local('☺'), url('fonts/fontin_sans_r_45b-webfont.woff') format('woff'), url('fonts/fontin_sans_r_45b-webfont.ttf') format('truetype'), url('fonts/fontin_sans_r_45b-webfont.svg#webfontfzHT0V6g') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SilkscreenNormal';
+    src: url('fonts/slkscr-webfont.eot');
+    src: local('☺'), url('fonts/slkscr-webfont.woff') format('woff'), url('fonts/slkscr-webfont.ttf') format('truetype'), url('fonts/slkscr-webfont.svg#webfontyngtz8Ka') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SilkscreenBold';
+    src: url('fonts/slkscrb-webfont.eot');
+    src: local('☺'), url('fonts/slkscrb-webfont.woff') format('woff'), url('fonts/slkscrb-webfont.ttf') format('truetype'), url('fonts/slkscrb-webfont.svg#webfontiGdFU2T7') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+h2.title_fontface
+{
+    font: 36px 'ChunkFiveRegular', Arial, sans-serif;letter-spacing: 0;
+}
+
+p.date_fontface
+{
+    font: 28px 'ChunkFiveRegular', Arial, sans-serif;letter-spacing: 0;
+}
+
+a.tags_fontface
+{
+    font: 16px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
+}
+
+a.comments_fontface
+{
+    font: 16px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
+}
+
 body 
 {
     background-color:#EBF2DF
@@ -23,9 +94,9 @@ pre
     background-color:#F5F8F1; 
     width:800px;
     margin:auto;
+    -moz-border-radius:20px;
     border-radius:20px;
     padding:20px;
-    /*-moz-box-shadow: 0 0 3px */
     border:2px #E2E8DA solid;
     rgba(0, 0, 0, 0.17);
 }
@@ -35,21 +106,22 @@ pre
     line-height:1.5em;
 }
 
-#entry_title 
+.entry_title 
 {
-    float:left;
-    font-size:1.375em;
+    /*float:left;*/
+    margin-top:10px;
     margin-left:156px;
     margin-right:20px;
+    margin-bottom:20px;
 }
 
-#entry_title h2 a
+.entry_title h2 a
 {
     color:black;
     text-decoration:none;
 }
 
-#entry_title h2 a:hover
+.entry_title h2 a:hover
 {
     text-decoration:underline;
 }
@@ -59,7 +131,7 @@ pre
 #entries .tags 
 {
     list-style: none outside none;
-    margin-left:0;
+    margin-left:158px;
     overflow: hidden;
 }
 
@@ -72,13 +144,12 @@ pre
 
 #entries .tags li a
 {
+    -moz-border-radius: 4px 4px 4px 4px;
     border-radius: 4px 4px 4px 4px;
     border:1px #93968E solid;
     background: none repeat scroll 0 0 #FFFFFF;
     color: #000000;
-    font-weight:bold;
     display:block;
-    font-size:75%;
     padding:2px 10px 2px 10px;
     text-decoration:none;
 }
@@ -88,7 +159,7 @@ pre
     text-decoration:underline;
 }
 
-#entry_body #date_comments
+.entry_body .date_comments
 {
   float:left;
   width: 140px;
@@ -102,17 +173,15 @@ pre
   margin-right:0px;
   background-color:#7CA240;
   color:#F2F7E9;
-  font-weight:600;
   font-size:200%;
   text-align:center;
+  -moz-border-radius:5px 5px 0 0;
   border-radius:5px 5px 0 0;
-
 }
 
-#entries .date #author
-{
-  font-size:40%;
-  font-weight:normal;
+#entries .date .author
+{ 
+  font: 12px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
 }
 
 #entries .comments_count
@@ -121,6 +190,7 @@ pre
   width:100%;
   text-align:center;
   background-color:#7AA5A9;
+  -moz-border-radius:0px 0px 5px 5px;
   border-radius:0px 0px 5px 5px;
   padding: 15px 0px 15px 0px;
 }
@@ -129,7 +199,6 @@ pre
 { 
   color:#F2F7E9;
   text-decoration:None; 
-  font-size:90%;
 }
 
 #entries .comments_count a:hover
@@ -142,12 +211,17 @@ pre
   margin-top:10px;
 }
 
-#text
+.text
 {
   margin-left:156px;
 }
 
-#text .left
+.text p
+{
+  font: 14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+}
+
+.text .left
 {
     /*clear:left;*/
     float:left;
@@ -156,12 +230,12 @@ pre
     max-width:40%;
 }
 
-#text p img
+.text p img
 {
     line-height:normal;
 }
 
-#text .center
+.text .center
 {
     display:block;
     /*clear:both;*/
@@ -171,19 +245,27 @@ pre
     padding:3px;
 }
 
-#text .readmore
+.text .readmore
 {
+  font: 14px 'FontinSansItalic', Arial, sans-serif;letter-spacing: 0;
   clear:left;
   float:left;
   margin-top:10px;
 }
 
-#text hr
+.text hr
 {
     margin-top:43px;
 }
 
-#entries .pagination
+#entries #pagination
 {
+    font: 16px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
     text-align:center;  
+}
+
+#entries #pagination #actual_page
+{
+    
+    font: 16px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
 }

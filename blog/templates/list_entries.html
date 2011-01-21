@@ -4,29 +4,29 @@
 {% for entry in entries %}
   <div class = "entry">
   {% set year, month, day = entry.creation_date.split('-') %}
-    <div id = "entry_title">
-      <h2><a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a></h2>
+    <div class = "entry_title">
+      <h2 class="title_fontface"><a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a></h2>
     </div>
     <ul class = "tags">
     {% for tag in entry.tags %}
       <li>
-        <a rel = "tag" href ="{{url_for('list_entries', tagname=tag)}}">{{ tag }}</a>
+        <a class="tags_fontface" rel = "tag" href ="{{url_for('list_entries', tagname=tag)}}">{{ tag }}</a>
       </li>
     {% endfor %}
 
     </ul>
-    <div id = "entry_body">
-      <div id = "date_comments">
+    <div class = "entry_body">
+      <div class = "date_comments">
         <div class = "date">
-          <p>{{ entry.human_date }}</p>
-          <div id = "author">Posted by {{entry.author}}</div>
+          <p class="date_fontface">{{ entry.human_date }}</p>
+          <div class = "author">Posted by {{entry.author}}</div>
         </div>
         <div class= "comments_count">
-          <a href = "{{url_for('view_entry', year = year, month = month, day = day, title = entry.slug)}}#disqus_thread" data-disqus-identifier="{{entry.slug}}"></a>
+          <a class= "comments_fontface" href = "{{url_for('view_entry', year = year, month = month, day = day, title = entry.slug)}}#disqus_thread" data-disqus-identifier="{{entry.slug}}"></a>
         </div>
       </div>
-      <div id = "text">
-        <p>{{ entry.content|safe }}</p>
+      <div class = "text">
+      {{ entry.content|safe }}
       </div>
       {% if entries|count == 1 %}
       <div id = comments>
@@ -53,7 +53,7 @@
   </div>
   {% endfor %}
   {% if pages is defined %}
-  <div class = "pagination">
+  <div id = "pagination">
   {% if actual_page == 1 %}
     <span>‹‹ previous</span>
   {% else %}
@@ -61,7 +61,7 @@
   {% endif %}
   {% for page in pages %}
     {% if page == actual_page or page == '...' %}
-      <span>{{page}}</span>
+      <span id = 'actual_page'>{{page}}</span>
     {% else %}
       <a href="{{url_for('list_entries', page=page)}}">{{page}}</a>
     {% endif %}
