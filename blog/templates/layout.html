@@ -30,7 +30,7 @@
   <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
   <!--[if (gt IE 9)|!(IE)]><!--> <body> <!--<![endif]-->
   <div id = "container">
-    <header>
+ <!-- <header>
     <div class = "login_bar">
       {% if session['user_id'] %}
       <p><a href = "{{url_for('logout')}}">Logout</a></p>
@@ -40,6 +40,15 @@
     {% for message in get_flashed_messages() %}
           <div class = flash>{{ message }} </div>
     {% endfor %}
+  </div> -->
+   <header>
+   <div id="nav_title">
+      <h1>ProudlyGeek's Blog</h1>
+      <ul>
+        <li><a href="/">About</a></li>
+        <li><a href="/">My Projects</a></li>
+        <li><a href="/">Blog</a></li>
+      </ul>
     </div>
     </header>
     <div id = "main">
@@ -49,5 +58,7 @@
     <footer>
     </footer>
   </div>
+  </div>
+  <link rel="stylesheet" href="{{url_for('static', filename='css/syntax-highlight.css')}}">
 </body>
 </html>
