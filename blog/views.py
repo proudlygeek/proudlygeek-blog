@@ -165,6 +165,12 @@ def add_entry():
     return redirect(url_for('list_entries'))
 
 
+@app.route('/projects')
+def show_projects():
+    """Simply reroute to list_entries."""
+    return list_entries(tagname='project')
+
+
 @app.route('/admin')
 def admin_panel():
     """Display a panel for administration purposes."""

@@ -52,6 +52,11 @@ Custom CSS
     font-style: normal;
 }
 
+h1.title_fontface
+{
+    color:#444444;
+    font: 36px 'ChunkFiveRegular', Arial, sans-serif;letter-spacing: 0;
+}
 
 h2.title_fontface
 {
@@ -88,6 +93,11 @@ header
   margin-bottom:25px;
 }
 
+footer
+{
+    height:97px;
+}
+
 #nav_title
 {
   width:860px;
@@ -96,12 +106,14 @@ header
   margin-right:auto;
   background-color:#F5F8F1;
   border:2px #E2E8DA solid;
+  border-top:0px;
   -moz-border-radius:0px 0px 20px 20px;
   border-radius:0px 0px 20px 20px;
 }
 
 #nav_title h1
 {
+  margin-top:-9px;
   float:left;
   padding:5px;
 }
@@ -113,6 +125,7 @@ header
   margin:auto;
   text-align:right;
   list-style: none outside none;
+  font:16px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
   overflow:hidden;
 }
 
@@ -122,9 +135,18 @@ header
   float:right;
 }
 
-#nav_title ul 
+#nav_title ul li a
 {
-  font: 14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+  color:#777777;
+  padding: 5px 10px;
+  text-decoration:none;
+}
+
+#nav_title ul li a:hover
+{
+  -moz-border-radius: 4px 4px 4px 4px;
+  border-radius: 4px 4px 4px 4px;
+  background-color:#DADADA;
 }
 
 #entries .entry
@@ -263,6 +285,7 @@ header
 .text p
 {
   font: 14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+  padding-bottom:15px;
 }
 
 .text .left

@@ -42,15 +42,17 @@
     {% endfor %}
   </div> -->
    <header>
-   <div id="nav_title">
-      <h1>ProudlyGeek's Blog</h1>
-      <ul>
-        <li><a href="/">About</a></li>
-        <li><a href="/">My Projects</a></li>
-        <li><a href="/">Blog</a></li>
-      </ul>
-    </div>
-    </header>
+   {% block header %}
+     <div id="nav_title">
+       <h1 class="title_fontface">ProudlyGeek ©</h1>
+         <ul>
+            <li><a href="/about">About</a></li>
+            <li><a href="/projects">My Projects</a></li>
+            <li><a href="/">Blog</a></li>
+         </ul>
+     </div>
+   {% endblock %}
+   </header>
     <div id = "main">
       {% block body %}
       {% endblock %}

@@ -1,4 +1,6 @@
 {% extends "layout.html" %}
+{% block header %}
+{% endblock %}
 {% block body %}
 {% if errors %} 
 <p class = error>
@@ -13,6 +15,7 @@
     <p><label>Title: <input type = "text", name = "title"></label></p>
     <p>
       <label>Image URL: <input type = "url", name = "img_url"> </label>
+      <label>Image File: <input type = "file", name = "img_file"> </label>
       <label>Alignment: 
         <select name = "img_align">
           <option value = "left"> Left </option>
