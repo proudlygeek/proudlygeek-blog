@@ -182,8 +182,11 @@ def show_projects():
 @app.route('/about')
 def show_about():
     """A simple, static page containing infos about me :)"""
-    with app.open_resource('static/pages/about.md') as f:
+    try:
+        f = app.open_resource('static/pages/about.md')
         about_txt = f.read()
+    except IOError:
+        pass
 
     entry = dict(body=about_txt)
 
