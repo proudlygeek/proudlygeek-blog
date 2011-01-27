@@ -18,7 +18,7 @@
 from views import app
 from flask import g, Markup
 from contextlib import closing
-from blog.helpers import slugify_entry
+from blog.helpers import slugify_entry, filter_projects
 
 
 if app.config['PLATFORM']=='sqlite':
@@ -300,6 +300,10 @@ class BigtableLayer(DataLayer):
         
         # Parse Markdown Text
         list_entries = gqlentries_to_list(entries)
+        
+        # Filter Projects
+        if not tagname: filter_projects(list_entries)
+
         fill_markdown_content(list_entries)
         
         return list_entries, num_entries

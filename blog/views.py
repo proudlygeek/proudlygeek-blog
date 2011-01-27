@@ -24,7 +24,8 @@ data_layer = factory(app.config['PLATFORM'])
 
 from helpers import check_password_hash, slugify_entry, \
      fill_entries, entry_pages, unpack_pages, split_pages, \
-     fill_author, fill_tags
+     fill_author, fill_tags, fill_markdown_content, \
+     generate_page_title
 import datetime
 import config
 
@@ -79,9 +80,16 @@ def list_entries(tagname=None):
 
     # Splitting pages
     splitted_pages = unpack_pages(split_pages(page, entry_pages(num_entries)))
+    
+    # Generating title
+    title = generate_page_title(tagname)
 
     # Jinja2 render
-    return render_template("list_entries.html", actual_page=page, entries=entries, pages=splitted_pages)
+    return render_template("list_entries.html",
+                            actual_page=page,
+                            entries=entries,
+                            pages=splitted_pages,
+                            title=title)
 
 
 @app.route('/articles/<int:year>/<int:month>/<int:day>/<title>')
@@ -169,6 +177,18 @@ def add_entry():
 def show_projects():
     """Simply reroute to list_entries."""
     return list_entries(tagname='project')
+
+
+@app.route('/about')
+def show_about():
+    """A simple, static page containing infos about me :)"""
+    with app.open_resource('static/pages/about.md') as f:
+        about_txt = f.read()
+
+    entry = dict(body=about_txt)
+
+    fill_markdown_content(entries=[entry], gen_readmore=False)
+    return render_template('about.html', entry=entry)
 
 
 @app.route('/admin')

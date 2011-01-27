@@ -123,7 +123,7 @@ def generate_readmore(entry, single=False):
     entry['content'] = entry['content'] + Markup("""<hr />""")
 
 
-def fill_markdown_content(entries):
+def fill_markdown_content(entries, gen_readmore=True):
     """
     Convenience function which converts entry's body Markdown
     syntax to HTML code.
@@ -134,9 +134,9 @@ def fill_markdown_content(entries):
         single = False
 
     for entry in entries:
-        pass
         entry['content'] = Markup(markdown.markdown(entry['body']))
-        generate_readmore(entry, single)
+        if gen_readmore: 
+            generate_readmore(entry, single)
 
 
 def humanize_date(date_string):
@@ -162,6 +162,40 @@ def fill_entries(entries):
     fill_markdown_content(entries)
     # Add author
     fill_author(entries)
+
+
+def filter_projects(entries):
+    """
+    Removes an entry from the list if it contains the tag "project";
+    this is useful for not displaying my projects on list_entries.html
+    without writing another template/function for this purpose.
+    """
+    for entry in entries:
+        if 'project' in entry['tags']:
+            entries.remove(entry)
+
+
+def generate_page_title(tagname):
+    """
+    Generates an appropriate title string given a page's
+    tag following these rules:
+
+    1) "Blog" if tagname is None;
+    2) "Entries tagged ``tag_test"" if tagname is not None;
+    3) <entry.title> if len(entries) ==  1 (*)
+    
+    (*) Single entry title case is handled directly into the 
+    views.view_entry method.
+    """
+    if tagname:
+        if tagname == "project":
+            title = """Projects"""
+        else:
+            title = u'Entries tagged “%s”' % (tagname)
+    else:
+        title = """Blog"""
+
+    return title
 
 
 def entry_pages(num_entries):

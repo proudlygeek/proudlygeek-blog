@@ -151,34 +151,48 @@ footer
 
 #entries .entry
 {
-    margin-top:25px;
-    margin-bottom:25px;
-    overflow:hidden;
+  margin-top:25px;
+  margin-bottom:25px;
+  overflow:hidden;
 }
+
+#entries .about
+{
+  font: 14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+}
+
+#entries .about h1
+{
+  font-size: 1.5em;
+  border-bottom: 1px solid #DADADA;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
 #entries 
 {
-    background-color:#F5F8F1; 
-    width:860px;
-    margin:auto;
-    -moz-border-radius:20px;
-    border-radius:20px;
-    padding:20px;
-    border:2px #E2E8DA solid;
-    rgba(0, 0, 0, 0.17);
+  background-color:#F5F8F1; 
+  width:860px;
+  margin:auto;
+  -moz-border-radius:20px;
+  border-radius:20px;
+  padding:20px;
+  border:2px #E2E8DA solid;
+  rgba(0, 0, 0, 0.17);
 }
 
 #entries li, #entries p
 {
-    line-height:1.5em;
+  line-height:1.5em;
 }
 
 .entry_title 
 {
-    /*float:left;*/
-    margin-top:10px;
-    margin-left:156px;
-    margin-right:20px;
-    margin-bottom:20px;
+  /*float:left;*/
+  margin-top:10px;
+  margin-left:156px;
+  margin-right:20px;
+  margin-bottom:20px;
 }
 
 .entry_title h2 a

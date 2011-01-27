@@ -5,8 +5,10 @@
     <!--[if IE]><![endif]-->
 
     <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
-         Remove this if you use the .htaccess -->
-    <title> Blog test </title>
+    Remove this if you use the .htaccess -->
+    <title>
+      {% block title %}{% endblock %} | Proudlygeek's babblings & ramblings 
+    </title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">   
     <meta name="description" content="">
     <meta name="author" content="">
@@ -62,5 +64,15 @@
   </div>
   </div>
   <link rel="stylesheet" href="{{url_for('static', filename='css/syntax-highlight.css')}}">
+  <script>
+     var _gaq = [['_setAccount', 'UA-5286378-2'], ['_trackPageview']];
+     (function(d, t) {
+      var g = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      g.async = true;
+      g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+   })(document, 'script');
+  </script>
 </body>
 </html>
