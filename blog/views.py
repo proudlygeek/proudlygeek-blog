@@ -105,7 +105,8 @@ def view_entry(year, month, day, title):
     if entry is None:
         abort(404)
     else:
-        return render_template('list_entries.html', entries=[entry])
+        return render_template('list_entries.html', entries=[entry],
+                                                    title=entry['title'])
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -165,8 +165,14 @@ footer
 {
   font-size: 1.5em;
   border-bottom: 1px solid #DADADA;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
+  padding-top:20px;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+#entries .about p
+{
+  margin-bottom:5px;
 }
 
 #entries 
