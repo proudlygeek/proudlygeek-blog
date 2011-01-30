@@ -33,7 +33,7 @@ div.codehilite .kc { color: #000000; font-weight: bold } /* Keyword.Constant */
 div.codehilite .kd { color: #000000; font-weight: bold } /* Keyword.Declaration */
 div.codehilite .kp { color: #000000; font-weight: bold } /* Keyword.Pseudo */
 div.codehilite .kr { color: #000000; font-weight: bold } /* Keyword.Reserved */
-div.codehilite .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+div.codehilite .kt { color: #D7D7AF; font-weight: bold } /* Keyword.Type */
 div.codehilite .kn {color: #D7D7AF;}
 div.codehilite .m { color: #009999 } /* Literal.Number */
 div.codehilite .s { color: #D78787 } /* Literal.String */

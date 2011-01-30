@@ -21,12 +21,23 @@ About this Website
 ==================
 
 This site is mainly used as a web log of my *coding* activies/experiments and related topics such as *programming languages*, *tools*, *algorithms* ecc.
-I'll try to write as much as possible even if i'm not a great *writer* so expect a lot of **low**, **boring** and **useless** posts. I warned *you*.
+I'll try to write as much as possible even if i'm not a great *writer* so expect a lot of **awful**, **boring** and **useless** posts. I warned *you*.
 
 What runs behind?
 =================
-This weblog was entirely built from scratch using [Flask][1], a very minimal python framework built on the top of Werkzeug.
+This weblog was entirely built from scratch using [Flask][1], a very minimal python framework made by [Armin Ronacher][2].
 
+It also *uses*:
+
+*  Posts are parsed with [markdown-python][3];
+*  Code snippets highlighting using [Pygments][4];
+*  Comments are handled by [Disqus][5];
+
+The source code is *available* at [GitHub][6].
 
 [1]: http://flask.pocoo.org
-                                                                                                                                        
+[2]: http://lucumr.pocoo.org/
+[3]: http://www.freewisdom.org/projects/python-markdown/
+[4]: http://pygments.org/
+[5]: http://disqus.com/
+[6]: http://www.github.com/proudlygeek/

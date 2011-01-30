@@ -170,7 +170,7 @@ footer
   margin-bottom: 15px;
 }
 
-#entries .about p
+#entries .about p, .about ul
 {
   margin-bottom:5px;
 }
@@ -300,6 +300,7 @@ footer
 .text
 {
   margin-left:156px;
+  padding-top:2px;
 }
 
 .text p
