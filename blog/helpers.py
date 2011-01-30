@@ -128,11 +128,6 @@ def fill_markdown_content(entries, gen_readmore=True):
     Convenience function which converts entry's body Markdown
     syntax to HTML code.
     """
-    from pygments import highlight
-    from pygments.lexers import get_lexer_by_name, guess_lexer, \
-                                            TextLexer
-    from pygments.formatters import HtmlFormatter
-
     
     if len(entries) == 1:
         single = True
