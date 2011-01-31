@@ -149,7 +149,26 @@ class SQLiteLayer(DataLayer):
         if entry:
             fill_entries([entry])
             return entry
-        
+
+    
+    def get_recent_entries(self, n):
+        """
+        Retrieves the latest n entries sorted by descending date
+        order; this is expecially useful for RSS feeds generation.
+        """
+        entries = self.query_db(
+                              """
+                              SELECT *
+                              FROM Entry
+                              ORDER BY creation_date DESC, id DESC 
+                              LIMIT ? 
+                              """, 
+                              n)
+
+        # Filling entries (Join tables for sqlite)
+        fill_entries(entries)
+        return entries
+
 
     def get_user(self, username):
         """Return the user model if the given username exists."""
@@ -325,6 +344,32 @@ class BigtableLayer(DataLayer):
         fill_markdown_content(list_entry)
 
         return list_entry[0]
+
+    def get_recent_entries(self, n):
+        """
+        Retrieves the latest n entries sorted by descending date
+        order; this is expecially useful for RSS feeds generation.
+        """
+        entries = db.GqlQuery(
+        """
+        SELECT *
+        FROM Entry
+        ORDER BY last_date DESC
+        """).fetch(n)
+        
+        import logging
+         
+        # Parse Markdown Text
+        list_entries = gqlentries_to_list(entries)
+        
+        logging.info(list_entries)
+        # Filter Projects
+        filter_projects(list_entries)
+
+        fill_markdown_content(list_entries)
+
+        return list_entries
+
 
     def get_user(self, username):
         """Return the user model if the given username exists."""

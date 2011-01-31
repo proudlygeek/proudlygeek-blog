@@ -14,13 +14,14 @@
 """
 
 from views import app
-from flask import g, Markup, url_for 
+from flask import g, Markup, url_for, request
 import math
 import hashlib
 import datetime
 import re
 import markdown
 from unicodedata import normalize
+from urlparse import urljoin
 
 
 def check_password_hash(string, check):
@@ -277,3 +278,8 @@ def unpack_pages(pages):
             plainlist.append(item)
         if item != pages[-1][-1]: plainlist.append("...")
     return plainlist
+
+
+def make_external(url):
+    """Makes the current URL external (Base + Relative = Absolute)"""
+    return urljoin(request.url_root, url)

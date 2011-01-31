@@ -25,7 +25,10 @@ data_layer = factory(app.config['PLATFORM'])
 from helpers import check_password_hash, slugify_entry, \
      fill_entries, entry_pages, unpack_pages, split_pages, \
      fill_author, fill_tags, fill_markdown_content, \
-     generate_page_title
+     generate_page_title, make_external
+
+from werkzeug.contrib.atom import AtomFeed
+
 import datetime
 import config
 
@@ -214,6 +217,40 @@ def admin_panel():
             return redirect(url_for('list_entries'))
     else:
         return redirect(url_for('login'))
+
+
+@app.route('/recent.atom')
+def recent_feed():
+    import logging
+    """
+    Returns the most recent entries displayed 
+    as RSS Atom feeds."""
+    feed = AtomFeed('Recent Entries',
+                    feed=request.url,
+                    url=request.url_root)
+    
+    entries = data_layer.get_recent_entries(15)
+    # Build feed info
+    for entry in entries:
+        update_date = datetime.datetime.strptime(entry['last_date'], '%Y-%m-%d')
+        publish_date = datetime.datetime.strptime(entry['creation_date'], '%Y-%m-%d')
+        # Building the entry's relative path
+        rel_path = url_for('view_entry', 
+                           year=publish_date.year,
+                           month=publish_date.month,
+                           day=publish_date.day,
+                           title=entry['slug'])
+
+        feed.add(entry['title'],
+                 unicode(entry['content']),
+                 content_type='html',
+                 author=entry['author'],
+                 # Absolute URL = BASE+REL
+                 url=make_external(rel_path),
+                 updated=update_date,
+                 published=publish_date)
+
+    return feed.get_response()
 
 
 if __name__ == "__main__":

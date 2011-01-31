@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/syntax.css')}}">
     <!-- For the less-enabled mobile browsers like Opera Mini -->
     <link rel="stylesheet" media="handheld" href="{{url_for('static', filename='css/handheld.css', v=1)}}">
+    <link href="{{url_for('recent_feed')}}" rel="alternate" title="Recent Changes" type="application/atom+xml">
+
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
     <script src="{{url_for('static', filename='js/modernizr-1.5.min.js')}}"></script>
   </head>
