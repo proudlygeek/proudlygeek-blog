@@ -16,6 +16,7 @@
 from views import app
 from flask import g, Markup, url_for, request
 import math
+import random
 import hashlib
 import datetime
 import re
@@ -283,3 +284,8 @@ def unpack_pages(pages):
 def make_external(url):
     """Makes the current URL external (Base + Relative = Absolute)"""
     return urljoin(request.url_root, url)
+
+
+def random_logo():
+    """Returns a random logo URL."""
+    return url_for('static', filename=("img/img_%d.png" % (random.randint(1,12))))

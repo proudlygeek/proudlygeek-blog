@@ -93,9 +93,38 @@ header
   margin-bottom:25px;
 }
 
+h1.title_fontface 
+{
+    float:left;
+    color: #444444;
+    font: 36px 'ChunkFiveRegular',Arial,sans-serif;
+    letter-spacing: 0;
+}
+
+h1#logo
+{
+  background: url('../img/img_default.png') no-repeat scroll center center transparent;
+  display:block;
+  width:600px;
+  height:450px;
+  margin-left:auto;
+  margin-right:auto;
+  text-indent:-2000em;
+}
+
 footer
 {
-    height:97px;
+    margin-bottom:25px;
+}
+
+footer #copyright
+{
+    width:860px;
+    margin-top:25px;
+    margin-left:auto;
+    margin-right:auto;
+    font:10px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+    text-align: center;
 }
 
 #nav_title
@@ -108,14 +137,8 @@ footer
   border:2px #E2E8DA solid;
   border-top:0px;
   -moz-border-radius:0px 0px 20px 20px;
-  border-radius:0px 0px 20px 20px;
-}
-
-#nav_title h1
-{
-  margin-top:-9px;
-  float:left;
-  padding:5px;
+  -webkit-border-bottom-left-radius:20px; 
+  -webkit-border-bottom-right-radius:20px;
 }
 
 #nav_title ul
@@ -144,8 +167,8 @@ footer
 
 #nav_title ul li a:hover
 {
-  -moz-border-radius: 4px 4px 4px 4px;
-  border-radius: 4px 4px 4px 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
   background-color:#DADADA;
 }
 
@@ -181,7 +204,7 @@ footer
   width:860px;
   margin:auto;
   -moz-border-radius:20px;
-  border-radius:20px;
+  -webkit-border-radius:20px;
   padding:20px;
   border:2px #E2E8DA solid;
   rgba(0, 0, 0, 0.17);
@@ -230,8 +253,8 @@ footer
 
 #entries .tags li a
 {
-    -moz-border-radius: 4px 4px 4px 4px;
-    border-radius: 4px 4px 4px 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
     border:1px #93968E solid;
     background: none repeat scroll 0 0 #FFFFFF;
     color: #000000;
@@ -262,7 +285,8 @@ footer
   font-size:200%;
   text-align:center;
   -moz-border-radius:5px 5px 0 0;
-  border-radius:5px 5px 0 0;
+  -webkit-border-top-left-radius:5px; 
+  -webkit-border-top-right-radius:5px;
 }
 
 #entries .date .author
@@ -277,7 +301,8 @@ footer
   text-align:center;
   background-color:#7AA5A9;
   -moz-border-radius:0px 0px 5px 5px;
-  border-radius:0px 0px 5px 5px;
+  -webkit-border-bottom-left-radius:5px; 
+  -webkit-border-bottom-right-radius:5px;
   padding: 15px 0px 15px 0px;
 }
 

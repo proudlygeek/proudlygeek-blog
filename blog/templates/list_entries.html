@@ -56,7 +56,7 @@
     <em>Unbelievable. No entries here so far</em>
   </div>
   {% endfor %}
-  {% if pages is defined %}
+  {% if pages is defined  and entries|count > 1%}
   <div id = "pagination">
   {% if actual_page == 1 %}
     <span>‹‹ previous</span>
@@ -76,6 +76,7 @@
     <a href="{{url_for('list_entries', page=actual_page+1)}}">next ››</a>
   </div>
   {% endif %}
+</div>
   {% endif %}
 </div>
 <script type="text/javascript">

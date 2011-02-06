@@ -14,7 +14,7 @@
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
     <!-- Place favicon.ico and apple-touch-icon.png in the root of your domain and delete these references -->
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <!-- CSS : implied media="all" -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/boilerplate.css', v='1')}}">
@@ -24,7 +24,6 @@
     <!-- For the less-enabled mobile browsers like Opera Mini -->
     <link rel="stylesheet" media="handheld" href="{{url_for('static', filename='css/handheld.css', v=1)}}">
     <link href="{{url_for('recent_feed')}}" rel="alternate" title="Recent Changes" type="application/atom+xml">
-
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
     <script src="{{url_for('static', filename='js/modernizr-1.5.min.js')}}"></script>
   </head>
@@ -49,11 +48,12 @@
    <header>
    {% block header %}
      <div id="nav_title">
-       <h1 class="title_fontface">ProudlyGeek ©</h1>
+       <h1 class="title_fontface">ProudlyGeek</h1>
          <ul>
-            <li><a href="/about">About</a></li>
+            <li><a href="/blog">Blog</a></li>
             <li><a href="/projects">My Projects</a></li>
-            <li><a href="/">Blog</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/">Home</a></li>
          </ul>
      </div>
    {% endblock %}
@@ -63,6 +63,12 @@
       {% endblock %}
     </div>
     <footer>
+    {% block footer %}
+    <div id="copyright">
+      <p>© Copyright 2011 by Gianluca Bargelli.</p>
+      <p>Content licensed under the Creative Commons attribution-noncommercial-sharealike License.</p>
+    </div>
+    {% endblock %}
     </footer>
   </div>
   </div>

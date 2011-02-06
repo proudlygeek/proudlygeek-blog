@@ -25,7 +25,7 @@ data_layer = factory(app.config['PLATFORM'])
 from helpers import check_password_hash, slugify_entry, \
      fill_entries, entry_pages, unpack_pages, split_pages, \
      fill_author, fill_tags, fill_markdown_content, \
-     generate_page_title, make_external
+     generate_page_title, make_external, random_logo
 
 from werkzeug.contrib.atom import AtomFeed
 
@@ -53,8 +53,8 @@ def after_request(response):
     return response
 
 
-@app.route('/')
-@app.route('/tags/<tagname>')
+@app.route('/blog')
+@app.route('/blog/tags/<tagname>')
 def list_entries(tagname=None):
     """
     Returns a list of entries in the form of pages containing
@@ -95,7 +95,7 @@ def list_entries(tagname=None):
                             title=title)
 
 
-@app.route('/articles/<int:year>/<int:month>/<int:day>/<title>')
+@app.route('/blog/articles/<int:year>/<int:month>/<int:day>/<title>')
 def view_entry(year, month, day, title):
     """Retrieves an article by date and title."""
     try:
@@ -221,11 +221,10 @@ def admin_panel():
 
 @app.route('/recent.atom')
 def recent_feed():
-    import logging
     """
     Returns the most recent entries displayed 
     as RSS Atom feeds."""
-    feed = AtomFeed('Recent Entries',
+    feed = AtomFeed("""Proudlygeek's babblings & ramblings""",
                     feed=request.url,
                     url=request.url_root)
     
@@ -251,6 +250,12 @@ def recent_feed():
                  published=publish_date)
 
     return feed.get_response()
+
+
+@app.route('/')
+def show_home():
+    """ This is the main page."""
+    return render_template('home.html', logo_url=random_logo())
 
 
 if __name__ == "__main__":

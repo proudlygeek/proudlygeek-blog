@@ -356,13 +356,10 @@ class BigtableLayer(DataLayer):
         FROM Entry
         ORDER BY last_date DESC
         """).fetch(n)
-        
-        import logging
          
         # Parse Markdown Text
         list_entries = gqlentries_to_list(entries)
         
-        logging.info(list_entries)
         # Filter Projects
         filter_projects(list_entries)
 
