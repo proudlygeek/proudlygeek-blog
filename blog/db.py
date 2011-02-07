@@ -252,7 +252,7 @@ class BigtableLayer(DataLayer):
     def __init__(self):
         # Create sample user admin:ciao
         user = User(username="Proudlygeek",key_name="admin_key",
-               password="f1b1a13033eddc3fdeecc0ed03bdc019c25890ba906658addad9fefe",
+               password="b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2",
                rank='admin')
         # Saves result to datastore
         db.put([user])
@@ -337,7 +337,7 @@ class BigtableLayer(DataLayer):
         """
         SELECT * FROM Entry
         WHERE slug =:1
-        AND creation_date =:2
+        AND creation_only_date =:2
         """, title, entry_date).get()
 
         list_entry = gqlentries_to_list([entry])
@@ -460,6 +460,7 @@ def gqlentries_to_list(gql_rs):
      'title':title_i, 
      'body':body_i, 
      'creation_date':creation_date_i,
+     'creation_only_date':creation_only_date_i,
      'human_date':human_date_i,
      'last_date':last_date_i,
      'user_id_FK':user_id_FK,
@@ -473,6 +474,7 @@ def gqlentries_to_list(gql_rs):
         'title':item.title,
         'body':item.body,
         'creation_date':item.creation_date,
+        'creation_only_date':item.creation_only_date,
         'human_date':item.creation_date.strftime('%d %b').upper(),
         'last_date':item.last_date,
         'user_id_FK':item.user_id_FK,

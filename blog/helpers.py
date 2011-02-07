@@ -30,7 +30,7 @@ def check_password_hash(string, check):
     Checks if the supplied string is equal to the password hash
     saved into the database.
     """
-    stringHash = hashlib.sha224(string).hexdigest()
+    stringHash = hashlib.sha256(string).hexdigest()
     if stringHash == check:
         return True
     else:

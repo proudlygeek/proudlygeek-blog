@@ -326,12 +326,37 @@ footer #copyright
 {
   margin-left:156px;
   padding-top:2px;
+  font: 14px 'FontinSansRegular',Arial,sans-serif;
 }
 
 .text p
 {
-  font: 14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
-  padding-bottom:15px;
+  margin-top:5px;
+  margin-bottom:5px;
+}
+
+.text h1
+{
+  font-size: 1.5em;
+  border-bottom: 1px solid #DADADA;
+  padding-top:20px;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+.text h2
+{
+  font-size: 1.15em;
+  border-bottom: 1px solid #DADADA;
+  padding-top:20px;
+  padding-bottom: 5px;
+  \margin-bottom: 15px;
+}
+
+.text ol
+{
+    margin-top:15px;
+    margin-bottom:15px;
 }
 
 .text .left
