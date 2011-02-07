@@ -36,7 +36,7 @@ class Entry(db.Model):
     slug = db.StringProperty(required=True)
     title = db.StringProperty(required=True)
     body = db.TextProperty(required=True)
-    creation_date = db.DateProperty(auto_now_add=True)
+    creation_date = db.DateTimeProperty(auto_now_add=True)
     last_date = db.DateTimeProperty(auto_now=True)
     user_id_FK = db.ReferenceProperty(User, collection_name='Owner')
     tags = db.StringListProperty()

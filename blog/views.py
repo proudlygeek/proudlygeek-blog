@@ -231,8 +231,8 @@ def recent_feed():
     entries = data_layer.get_recent_entries(15)
     # Build feed info
     for entry in entries:
-        update_date = datetime.datetime.strptime(entry['last_date'], '%Y-%m-%d')
-        publish_date = datetime.datetime.strptime(entry['creation_date'], '%Y-%m-%d')
+        update_date = entry['last_date']
+        publish_date = entry['creation_date']
         # Building the entry's relative path
         rel_path = url_for('view_entry', 
                            year=publish_date.year,

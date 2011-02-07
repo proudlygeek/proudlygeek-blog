@@ -7,7 +7,9 @@
 <div id = "entries">
 {% for entry in entries %}
   <div class = "entry">
-  {% set year, month, day = entry.creation_date.split('-') %}
+  {% set year = entry.creation_date.year %}
+  {% set month = entry.creation_date.month %}
+  {% set day = entry.creation_date.day %}
     <div class = "entry_title">
       <h2 class="title_fontface"><a href = {{url_for('view_entry', year = year, month = month, day = day, title = entry.slug) }}>{{ entry.title }}</a></h2>
     </div>
@@ -76,8 +78,8 @@
     <a href="{{url_for('list_entries', page=actual_page+1)}}">next ››</a>
   </div>
   {% endif %}
-</div>
   {% endif %}
+</div>
 </div>
 <script type="text/javascript">
     var disqus_shortname = 'proudlygeek-blog';

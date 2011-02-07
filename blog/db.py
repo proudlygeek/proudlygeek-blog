@@ -472,9 +472,9 @@ def gqlentries_to_list(gql_rs):
         'author':item.user_id_FK.username,
         'title':item.title,
         'body':item.body,
-        'creation_date':item.creation_date.strftime('%Y-%m-%d'),
+        'creation_date':item.creation_date,
         'human_date':item.creation_date.strftime('%d %b').upper(),
-        'last_date':item.last_date.strftime('%Y-%m-%d'),
+        'last_date':item.last_date,
         'user_id_FK':item.user_id_FK,
         'tags':item.tags}
         result_list.append(d)
