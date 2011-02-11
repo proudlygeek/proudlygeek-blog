@@ -251,11 +251,12 @@ class SQLiteLayer(DataLayer):
 class BigtableLayer(DataLayer):
     def __init__(self):
         # Create sample user admin:ciao
-        user = User(username="Proudlygeek",key_name="admin_key",
-               password="b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2",
-               rank='admin')
+        #user = User(username="Proudlygeek",key_name="admin_key",
+        #       password="b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2",
+        #       rank='admin')
         # Saves result to datastore
-        db.put([user])
+        #db.put([user])
+        pass
 
     def connect_db(self):
         pass
@@ -345,6 +346,19 @@ class BigtableLayer(DataLayer):
 
         return list_entry[0]
 
+    def get_entry_by_id(self, entry_id):
+        """
+        Retrieves a specific entry by specifing an unique
+        ID as argument; this method is expectin to fetch
+        one or none entries from the database.
+        """
+        k = db.Key.from_path('Entry', entry_id)
+        entry = db.get(k)
+
+        list_entry = gqlentries_to_list([entry])
+        return list_entry[0]
+
+
     def get_recent_entries(self, n):
         """
         Retrieves the latest n entries sorted by descending date
@@ -379,6 +393,7 @@ class BigtableLayer(DataLayer):
 
         return gqluser_to_dict(user)
 
+
     def load_user_profile(self, id_or_name):
         """Load a user's profile given his unique id."""
         profile_key = db.Key.from_path('User', str(id_or_name))
@@ -386,8 +401,9 @@ class BigtableLayer(DataLayer):
 
         return gqluser_to_dict(user_profile)
 
+
     def insert_entry(self, title, text, owner, tags):
-        """Inserts a new entry post into the datastore."""
+        """Insert a new entry."""
         # Retrieves Owner's key
         owner_key = db.Key.from_path('User', owner)
         # Create a new entity (without tags)
@@ -403,8 +419,23 @@ class BigtableLayer(DataLayer):
 
         # Store Entity
         db.put(new_entry)
- 
-        
+
+
+    def update_entry(self, entry_id, title, text, tags):
+        """Update an existing entry."""
+        # Retrieve old entity
+        entry_key = db.Key.from_path('Entry', entry_id)
+        existing_entry = db.get(entry_key)
+
+        # Update entity
+        existing_entry.slug = slugify_entry(title)
+        existing_entry.title = title
+        existing_entry.body = text
+        # Insert tags into entry's list
+        existing_entry.tags = tags.split()
+        # Store Entity
+        existing_entry.put()
+
 def factory(db_name):
     """
     Returns the appropriate data layer class by using the db_name
@@ -455,7 +486,8 @@ def gqlentries_to_list(gql_rs):
      
     where the generic dictionary element {<rsi>} is:
     
-    {'slug':slug_i,
+    {'entry_id':entry_id_i,
+     'slug':slug_i,
      'author':user_id_FK_i.username,
      'title':title_i, 
      'body':body_i, 
@@ -469,7 +501,9 @@ def gqlentries_to_list(gql_rs):
     """
     result_list = list()
     for item in gql_rs:
-        d = {'slug':item.slug,
+        d = {
+        'entry_id':item.key().id(),
+        'slug':item.slug,
         'author':item.user_id_FK.username,
         'title':item.title,
         'body':item.body,

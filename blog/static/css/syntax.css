@@ -29,8 +29,8 @@ div.codehilite .gp { color: #555555 } /* Generic.Prompt */
 div.codehilite .gs { font-weight: bold } /* Generic.Strong */
 div.codehilite .gu { color: #aaaaaa } /* Generic.Subheading */
 div.codehilite .gt { color: #aa0000 } /* Generic.Traceback */
-div.codehilite .kc { color: #000000; font-weight: bold } /* Keyword.Constant */
-div.codehilite .kd { color: #000000; font-weight: bold } /* Keyword.Declaration */
+div.codehilite .kc { color: #FFD7AF; font-weight: bold } /* Keyword.Constant */
+div.codehilite .kd { color: #FFD7AF; font-weight: bold } /* Keyword.Declaration */
 div.codehilite .kp { color: #000000; font-weight: bold } /* Keyword.Pseudo */
 div.codehilite .kr { color: #000000; font-weight: bold } /* Keyword.Reserved */
 div.codehilite .kt { color: #D7D7AF; font-weight: bold } /* Keyword.Type */

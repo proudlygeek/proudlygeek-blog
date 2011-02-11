@@ -163,18 +163,46 @@ def add_entry():
                     img_string = """<img src = "%s" class = "%s"/>""" % (request.form['img_url'], request.form['img_align'])
                     entry_text = img_string + entry_text
 
-                data_layer.insert_entry(
-                     title=request.form['title'],
-                     text=entry_text,
-                     owner=g.user['id'],
-                     tags=request.form['tags'])
+                # Duck Typing (Insert or Update)
+                try:
+                    entry_id = int(request.form['entry_id'])
+                except KeyError:
+                    entry_id = None
 
-                flash('Entry added.')
+                if entry_id:
+                    data_layer.update_entry(
+                            entry_id=entry_id,
+                            title=request.form['title'],
+                            text=entry_text,
+                            tags=request.form['tags'])
+                    flash('Entry edited.')
+                else:
+                    data_layer.insert_entry(
+                         title=request.form['title'],
+                         text=entry_text,
+                         owner=g.user['id'],
+                         tags=request.form['tags'])
+                    flash('Entry added.')
+                
                 return redirect(url_for('list_entries'))
 
         return render_template('add_entry.html', errors=errors)
 
     return redirect(url_for('list_entries'))
+
+
+@app.route('/edit/<int:entry_id>')
+def edit_entry(entry_id):
+    """Displays a page for editing an existing entry."""
+    if g.user:
+        entry = data_layer.get_entry_by_id(entry_id)
+
+        if entry is None:
+            return abort(404)
+        else:
+            return render_template('edit_entry.html', entry=entry)
+    else:
+        return redirect(url_for('list_entries'))
 
 
 @app.route('/projects')

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Edit {{ entry.title }}{% endblock %}
+{% block header %} {% endblock %}
+
+{% block body %}
+<div id = "edit-form">
+  <form action ="{{ url_for('add_entry') }}" method = "POST">
+    <p><label>Title: <input type = "text", name = "title", value = "{{ entry.title }}" /></label></p>
+    <p>
+      <label>Image URL: <input type = "url", name = "img_url"> </label>
+      <label>Alignment: 
+        <select name = "img_align">
+          <option value = "left"> Left </option>
+          <option value = "center"> Center </option>
+        </select>
+      </label>
+    </p>
+    <p><label><p>Entry's text</p><textarea id = "text_edit" name="entry_text">{{ entry.body }}</textarea></p>
+    <p><label><p>Tags:</p><input type = "text" name = "tags" value = "{{ ' '.join(entry.tags) }}"/>
+    <input type = 'hidden' name ="entry_id" value="{{ entry.entry_id }}" />
+    <p><input type = "Submit" value = "submit"></p>
+  </form>
+</div>
+{% endblock %}

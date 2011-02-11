@@ -34,22 +34,14 @@
   <!--[if IE 9 ]>    <body class="ie9"> <![endif]-->
   <!--[if (gt IE 9)|!(IE)]><!--> <body> <!--<![endif]-->
   <div id = "container">
- <!-- <header>
-    <div class = "login_bar">
-      {% if session['user_id'] %}
-      <p><a href = "{{url_for('logout')}}">Logout</a></p>
-    {% else %}
-      <p><a href = "{{url_for('login')}}">Login</a></p>
-    {% endif %}
-    {% for message in get_flashed_messages() %}
-          <div class = flash>{{ message }} </div>
-    {% endfor %}
-  </div> -->
-   <header>
+  <header>
    {% block header %}
      <div id="nav_title">
        <h1 class="title_fontface">ProudlyGeek</h1>
          <ul>
+          {% if session['user_id'] %}
+            <li><a href = "{{url_for('logout')}}">Logout</a></li>
+          {% endif %}
             <li><a href="/blog">Blog</a></li>
             <li><a href="/projects">My Projects</a></li>
             <li><a href="/about">About</a></li>
@@ -57,6 +49,11 @@
          </ul>
      </div>
    {% endblock %}
+     <div class = "login_bar">
+      {% for message in get_flashed_messages() %}
+        <div class = flash>{{ message }} </div>
+      {% endfor %}
+    </div>
    </header>
     <div id = "main">
       {% block body %}
