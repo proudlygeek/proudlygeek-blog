@@ -399,23 +399,28 @@ footer #copyright
     padding:3px;
 }
 
-.text .readmore
+.text a.readmore
 {
+  display: block;
   font: 14px 'FontinSansItalic', Arial, sans-serif;letter-spacing: 0;
-  clear:left;
-  float:left;
-  margin-top:10px;
-}
-
-.text hr
-{
-    margin-top:43px;
+  margin-top:25px;
+  margin-bottom:25px;
 }
 
 .text pre
 {
-    margin-top:20px;
-    margin-bottom:20px;
+  margin-top:20px;
+  margin-bottom:20px;
+}
+
+.text code
+{
+  padding: 1px 5px 1px 5px;
+  font: 13px 'DroidSansMonoRegular', Monaco, "Courier New", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", monospace;letter-spacing: 0;
+  color: #D7D7D7;
+  background-color: #3A3A3A;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
 }
 
 .text blockquote
