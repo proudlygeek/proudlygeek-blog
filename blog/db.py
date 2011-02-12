@@ -289,7 +289,7 @@ class BigtableLayer(DataLayer):
             """
             SELECT *
             FROM Entry
-            ORDER BY last_date DESC
+            ORDER BY creation_date DESC
             LIMIT ? OFFSET ?
             """,
             (app.config['MAX_PAGE_ENTRIES'], offset))
@@ -306,7 +306,7 @@ class BigtableLayer(DataLayer):
             SELECT *
             FROM Entry
             WHERE tags = '?'
-            ORDER BY last_date DESC
+            ORDER BY creation_date DESC
             LIMIT ? OFFSET ?
             """,
             (tagname, app.config['MAX_PAGE_ENTRIES'], offset ))
