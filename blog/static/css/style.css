@@ -71,12 +71,12 @@ p.date_fontface
 
 a.tags_fontface
 {
-    font: 16px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
+    font: 14px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
 }
 
 a.comments_fontface
 {
-    font: 16px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
+    font: 14px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
 }
 
 body 
@@ -120,7 +120,7 @@ footer
 
 footer #copyright
 {
-    width:860px;
+    width:960px;
     margin-top:25px;
     margin-left:auto;
     margin-right:auto;
@@ -130,14 +130,14 @@ footer #copyright
 
 .login_bar
 {
-  width:860px;
+  width:960px;
   margin-left:auto;
   margin-right:auto;
 }
 
 #nav_title
 {
-  width:860px;
+  width:960px;
   padding:20px;
   margin-left:auto;
   margin-right:auto;
@@ -156,7 +156,7 @@ footer #copyright
   margin:auto;
   text-align:right;
   list-style: none outside none;
-  font:16px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+  font:14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
   overflow:hidden;
 }
 
@@ -209,7 +209,7 @@ footer #copyright
 #entries 
 {
   background-color:#F5F8F1; 
-  width:860px;
+  width:960px;
   margin:auto;
   -moz-border-radius:20px;
   -webkit-border-radius:20px;
@@ -421,6 +421,8 @@ footer #copyright
   background-color: #3A3A3A;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
+  text-align: center;
+  text-shadow: 1px 1px 0 #000000;
 }
 
 .text blockquote
@@ -446,12 +448,12 @@ footer #copyright
 
 #entries #pagination
 {
-    font: 16px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
+    font: 14px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
     text-align:center;  
 }
 
 #entries #pagination #actual_page
 {
     
-    font: 16px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
+    font: 14px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
 }

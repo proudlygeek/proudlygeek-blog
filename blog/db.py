@@ -341,8 +341,11 @@ class BigtableLayer(DataLayer):
         AND creation_only_date =:2
         """, title, entry_date).get()
 
-        list_entry = gqlentries_to_list([entry])
-        fill_markdown_content(list_entry)
+        if entry is not None:
+            list_entry = gqlentries_to_list([entry])
+            fill_markdown_content(list_entry)
+        else:
+            list_entry = [None]
 
         return list_entry[0]
 
