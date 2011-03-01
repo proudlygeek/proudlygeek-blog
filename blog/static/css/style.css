@@ -278,7 +278,7 @@ footer #copyright
 
 .entry_body .date_comments
 {
-  float:left;
+  float: left;
   width: 140px;
 }
 
@@ -316,7 +316,8 @@ footer #copyright
 }
 
 #entries .comments_count a
-{ 
+{
+  display: block;
   color:#F2F7E9;
   text-decoration:None; 
 }
@@ -444,6 +445,28 @@ footer #copyright
 .text blockquote p
 {
   margin-bottom:0;
+}
+
+.text span#votebox
+{
+    position: relative;
+    font-size: 18px;
+    color: #FFFFFF;
+    padding: 15px 145px 15px 15px;
+    margin: 0 auto;
+    width: 300px;
+    background-color: #444444;
+    display: block;
+}
+
+.text span#votebox span
+{
+    display: block;
+    position: absolute;
+    font-size: 72px;
+    right: 0px;
+    top: 45%;
+    margin: 0 25px;
 }
 
 #entries #pagination

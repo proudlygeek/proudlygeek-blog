@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 
-    blog.helpers
+    blog.models
     ~~~~~~~~~~~~~~~~~~
 
-    This module contains helper functions mainly used by 
-    the views module.
+    This module contains GAE models.
 
     :copyright: (c) 2010 by Gianluca Bargelli.
     :license: MIT License, see LICENSE for more details.
