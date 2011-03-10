@@ -109,7 +109,7 @@
 .gist-syntax .ne { color: #990000; font-weight: bold } /* Name.Exception */
 .gist-syntax .nf { color: #FFFF87; font-weight: bold } /* Name.Function */
 .gist-syntax .nn { color: #D7D7D7; } /* Name.Namespace */
-.gist-syntax .nt { color: #000080 } /* Name.Tag */
+.gist-syntax .nt { color: #A7AA86; } /* Name.Tag */
 .gist-syntax .nv { color: #008080 } /* Name.Variable */
 .gist-syntax .ow { color: #FFFFD1; font-weight: bold } /* Operator.Word */
 .gist-syntax .w { color:  #bbbbbb } /* Text.Whitespace */

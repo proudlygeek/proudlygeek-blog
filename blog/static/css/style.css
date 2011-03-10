@@ -36,27 +36,10 @@ Custom CSS
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'SilkscreenNormal';
-    src: url('fonts/slkscr-webfont.eot');
-    src: local('☺'), url('fonts/slkscr-webfont.woff') format('woff'), url('fonts/slkscr-webfont.ttf') format('truetype'), url('fonts/slkscr-webfont.svg#webfontyngtz8Ka') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'SilkscreenBold';
-    src: url('fonts/slkscrb-webfont.eot');
-    src: local('☺'), url('fonts/slkscrb-webfont.woff') format('woff'), url('fonts/slkscrb-webfont.ttf') format('truetype'), url('fonts/slkscrb-webfont.svg#webfontiGdFU2T7') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
 h1.title_fontface
 {
     color:#444444;
     font: 36px 'ChunkFiveRegular', Arial, sans-serif;letter-spacing: 0;
-    margin-top:-5px;
 }
 
 h2.title_fontface
@@ -71,12 +54,12 @@ p.date_fontface
 
 a.tags_fontface
 {
-    font: 14px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
+    font: 12px 'FontinSansBold', Arial, sans-serif;letter-spacing: 0;
 }
 
 a.comments_fontface
 {
-    font: 14px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
+    font: 17px 'ChunkFiveRegular', Arial, sans-serif;letter-spacing: 0;
 }
 
 body 
@@ -124,7 +107,7 @@ footer #copyright
     margin-top:25px;
     margin-left:auto;
     margin-right:auto;
-    font:10px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+    font: 12px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
     text-align: center;
 }
 
@@ -147,6 +130,8 @@ footer #copyright
   -moz-border-radius:0px 0px 20px 20px;
   -webkit-border-bottom-left-radius:20px; 
   -webkit-border-bottom-right-radius:20px;
+  border-bottom-left-radius:20px;
+  border-bottom-right-radius:20px;
 }
 
 #nav_title ul
@@ -156,7 +141,7 @@ footer #copyright
   margin:auto;
   text-align:right;
   list-style: none outside none;
-  font:14px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
+  font: 16px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
   overflow:hidden;
 }
 
@@ -171,12 +156,14 @@ footer #copyright
   color:#777777;
   padding: 5px 10px;
   text-decoration:none;
+  display: block;
 }
 
 #nav_title ul li a:hover
 {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
+  border-radius: 4px;
   background-color:#DADADA;
 }
 
@@ -213,6 +200,7 @@ footer #copyright
   margin:auto;
   -moz-border-radius:20px;
   -webkit-border-radius:20px;
+  border-radius: 20px;
   padding:20px;
   border:2px #E2E8DA solid;
   rgba(0, 0, 0, 0.17);
@@ -248,13 +236,15 @@ footer #copyright
 #entries .tags 
 {
     list-style: none outside none;
-    margin-left:158px;
-    overflow: hidden;
+    margin: 0;
+    margin-top: 25px;
+    /*margin-left:158px;*/
+    /*overflow: hidden;*/
 }
 
 #entries .tags li
 {
-    float:left;
+    float: left;
     margin-right:5px;
     margin-bottom:5px;
 }
@@ -263,17 +253,19 @@ footer #copyright
 {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
+    border-radius: 4px;
     border:1px #93968E solid;
     background: none repeat scroll 0 0 #FFFFFF;
-    color: #000000;
+    color: #777777;
     display:block;
-    padding:2px 10px 2px 10px;
+    padding:2px 5px;
     text-decoration:none;
 }
 
 #entries .tags li a:hover
 {
-    text-decoration:underline;
+    color: #000000;
+    border: 1px #000 solid;
 }
 
 .entry_body .date_comments
@@ -285,7 +277,7 @@ footer #copyright
 #entries .date
 {
   margin-left:0;
-  margin-top:4px;
+  margin-top:5px;
   padding:15px 10px;
   margin-right:0px;
   background-color:#7CA240;
@@ -295,6 +287,8 @@ footer #copyright
   -moz-border-radius:5px 5px 0 0;
   -webkit-border-top-left-radius:5px; 
   -webkit-border-top-right-radius:5px;
+  border-top-left-radius:5px;
+  border-top-right-radius:5px;
 }
 
 #entries .date .author
@@ -304,7 +298,6 @@ footer #copyright
 
 #entries .comments_count
 {
-  float:left;
   font: 12px 'FontinSansRegular', Arial, sans-serif;letter-spacing: 0;
   width:100%;
   text-align:center;
@@ -312,6 +305,8 @@ footer #copyright
   -moz-border-radius:0px 0px 5px 5px;
   -webkit-border-bottom-left-radius:5px; 
   -webkit-border-bottom-right-radius:5px;
+  border-bottom-left-radius:5px;
+  border-bottom-right-radius:5px;
   padding: 15px 0px 15px 0px;
 }
 
@@ -335,7 +330,6 @@ footer #copyright
 .text
 {
   margin-left:156px;
-  padding-top:2px;
   font: 14px 'FontinSansRegular',Arial,sans-serif;
 }
 
@@ -351,6 +345,7 @@ footer #copyright
   padding-top:20px;
   padding-bottom: 5px;
   margin-bottom: 15px;
+  overflow: hidden;
 }
 
 .text h2
@@ -367,13 +362,18 @@ footer #copyright
     margin-bottom:15px;
 }
 
+.text ol
+{
+    list-style: decimal inside none;
+}
+
 .text .left
 {
     /*clear:left;*/
     float:left;
     padding:3px;
     margin: 0em 1.5em 1em 0em;
-    max-width:40%;
+    max-width: 200px;
 }
 
 .text .right
@@ -403,7 +403,7 @@ footer #copyright
 .text a.readmore
 {
   display: block;
-  font: 14px 'FontinSansItalic', Arial, sans-serif;letter-spacing: 0;
+  font: 16px 'FontinSansItalic', Arial, sans-serif;letter-spacing: 0;
   margin-top:25px;
   margin-bottom:25px;
 }
@@ -422,6 +422,7 @@ footer #copyright
   background-color: #3A3A3A;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
+  border-radius: 4px;
   text-align: center;
   text-shadow: 1px 1px 0 #000000;
 }
@@ -471,12 +472,12 @@ footer #copyright
 
 #entries #pagination
 {
-    font: 14px 'SilkscreenNormal', Arial, sans-serif;letter-spacing: 0;
+    font: 12px 'FontinSansNormal', Arial, sans-serif;letter-spacing: 0;
     text-align:center;  
 }
 
 #entries #pagination #actual_page
 {
     
-    font: 14px 'SilkscreenBold', Arial, sans-serif;letter-spacing: 0;
+    font: 14px 'FontinSansBold', Arial, sans-serif;letter-spacing: 0;
 }

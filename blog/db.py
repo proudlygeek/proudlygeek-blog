@@ -17,7 +17,6 @@
 
 from views import app
 from flask import g, Markup
-from contextlib import closing
 from blog.helpers import slugify_entry, filter_projects
 
 
@@ -25,6 +24,7 @@ if app.config['PLATFORM']=='sqlite':
     try:
         import sqlite3
         import datetime
+        from contextlib import closing
         from blog.helpers import fill_entries
     except ImportError:
         print "Database Wrapper error (sqlite)."
@@ -371,7 +371,7 @@ class BigtableLayer(DataLayer):
         """
         SELECT *
         FROM Entry
-        ORDER BY last_date DESC
+        ORDER BY creation_date DESC
         """).fetch(n)
          
         # Parse Markdown Text

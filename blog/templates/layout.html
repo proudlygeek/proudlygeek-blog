@@ -17,12 +17,12 @@
     <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <!-- CSS : implied media="all" -->
-    <link rel="stylesheet" href="{{url_for('static', filename='css/boilerplate.css', v='1')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/boilerplate.css')}}">
     <!-- CSS : My style -->
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/syntax.css')}}">
     <!-- For the less-enabled mobile browsers like Opera Mini -->
-    <link rel="stylesheet" media="handheld" href="{{url_for('static', filename='css/handheld.css', v=1)}}">
+    <link rel="stylesheet" media="handheld" href="{{url_for('static', filename='css/handheld.css')}}">
     <link href="{{url_for('recent_feed')}}" rel="alternate" title="Recent Changes" type="application/atom+xml">
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
     <script src="{{url_for('static', filename='js/modernizr-1.5.min.js')}}"></script>
@@ -64,6 +64,7 @@
     <div id="copyright">
       <p>© Copyright 2011 by Gianluca Bargelli.</p>
       <p>Content licensed under the Creative Commons attribution-noncommercial-sharealike License.</p>
+      <p>(<a href={{url_for('recent_feed')}}>feed</a>)</p>
     </div>
     {% endblock %}
     </footer>
